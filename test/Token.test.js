@@ -1,7 +1,7 @@
 const Token = artifacts.require("./Token");
 require("chai").use(require("chai-as-promised")).should();
 
-contract("Token", ([deployer]) => {
+contract("Token", ([deployer, receiver]) => {
   const name = "FToken";
   const symbol = "FT";
   const decimals = "18";
@@ -37,6 +37,28 @@ contract("Token", ([deployer]) => {
     it("it assigns the total supply to the supplier", async () => {
       const result = await token.balanceOf(deployer);
       result.toString().should.equal(totalSupply);
+    });
+  });
+
+  describe("sending tokens", () => {
+    it("transfers token balances", async () => {
+      let balanceOf;
+      //before transfer
+      balanceOf = await token.balanceOf(deployer);
+      console.log("deployer balance", balanceOf.toString());
+      balanceOf = await token.balanceOf(receiver);
+      console.log("receiver balance", balanceOf.toString());
+
+      //transfer
+      await token.transfer(receiver, "1000000000000000000000000", {
+        from: deployer,
+      });
+      //after transfer
+
+      balanceOf = await token.balanceOf(deployer);
+      console.log("deployer after", balanceOf.toString());
+      balanceOf = await token.balanceOf(receiver);
+      console.log("receiver after", balanceOf.toString());
     });
   });
 });
