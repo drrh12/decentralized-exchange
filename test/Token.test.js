@@ -1,11 +1,15 @@
 const Token = artifacts.require("./Token");
 require("chai").use(require("chai-as-promised")).should();
 
+const tokens = (n) => {
+  return new web3.utils.BN(web3.utils.toWei(n.toString(), "ether"));
+};
+
 contract("Token", ([deployer, receiver]) => {
   const name = "FToken";
   const symbol = "FT";
   const decimals = "18";
-  const totalSupply = "1000000000000000000000000";
+  const totalSupply = tokens(1000000).toString();
   let token;
 
   beforeEach(async () => {
@@ -31,12 +35,12 @@ contract("Token", ([deployer, receiver]) => {
 
     it("tracks the total sypply", async () => {
       const result = await token.totalSupply();
-      result.toString().should.equal(totalSupply);
+      result.toString().should.equal(totalSupply.toString());
     });
 
     it("it assigns the total supply to the supplier", async () => {
       const result = await token.balanceOf(deployer);
-      result.toString().should.equal(totalSupply);
+      result.toString().should.equal(totalSupply.toString());
     });
   });
 
@@ -50,11 +54,10 @@ contract("Token", ([deployer, receiver]) => {
       console.log("receiver balance", balanceOf.toString());
 
       //transfer
-      await token.transfer(receiver, "1000000000000000000000000", {
+      await token.transfer(receiver, tokens(100), {
         from: deployer,
       });
       //after transfer
-
       balanceOf = await token.balanceOf(deployer);
       console.log("deployer after", balanceOf.toString());
       balanceOf = await token.balanceOf(receiver);
