@@ -57,8 +57,12 @@ contract("Token", ([deployer, receiver]) => {
       });
       //after transfer
       balanceOf = await token.balanceOf(deployer);
+      balanceOf.toString().should.equal(tokens(999900).toString());
       console.log("deployer after", balanceOf.toString());
+
       balanceOf = await token.balanceOf(receiver);
+      balanceOf.toString().should.equal(tokens(100).toString());
+
       console.log("receiver after", balanceOf.toString());
     });
   });
