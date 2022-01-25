@@ -45,32 +45,47 @@ contract("Token", ([deployer, receiver]) => {
   describe("sending tokens", () => {
     let amount;
     let result;
-    beforeEach(async () => {
-      amount = tokens(100);
-      result = await token.transfer(receiver, amount, {
-        from: deployer,
+
+    describe("success", async () => {
+      beforeEach(async () => {
+        amount = tokens(100);
+        result = await token.transfer(receiver, amount, {
+          from: deployer,
+        });
+      });
+
+      it("transfers token balances", async () => {
+        let balanceOf;
+        //after transfer
+        balanceOf = await token.balanceOf(deployer);
+        balanceOf.toString().should.equal(tokens(999900).toString());
+        console.log("deployer after", balanceOf.toString());
+
+        balanceOf = await token.balanceOf(receiver);
+        balanceOf.toString().should.equal(tokens(100).toString());
+
+        console.log("receiver after", balanceOf.toString());
+      });
+
+      it("emits a transfer event", async () => {
+        const log = result.logs[0];
+        log.event.should.eq("Transfer");
+        const event = log.args;
+        event.from.toString().should.equal(deployer, "from is correct");
+        event.value.toString().should.equal(amount.toString());
       });
     });
 
-    it("transfers token balances", async () => {
-      let balanceOf;
-      //after transfer
-      balanceOf = await token.balanceOf(deployer);
-      balanceOf.toString().should.equal(tokens(999900).toString());
-      console.log("deployer after", balanceOf.toString());
-
-      balanceOf = await token.balanceOf(receiver);
-      balanceOf.toString().should.equal(tokens(100).toString());
-
-      console.log("receiver after", balanceOf.toString());
-    });
-
-    it("emits a transfer event", async () => {
-      const log = result.logs[0];
-      log.event.should.eq("Transfer");
-      const event = log.args;
-      event.from.toString().should.equal(deployer, "from is correct");
-      event.value.toString().should.equal(amount.toString());
+    describe("failure", async () => {
+      it("rejects insufficient balances", async () => {
+        let invalidAmount;
+        invalidAmount = tokens(10); //100M - greater than the supply
+        await token
+          .transfer(receiver, invalidAmount, { from: deployer })
+          .should.be.rejectedWith(
+            "VM Exception while processing transaction: revert"
+          );
+      });
     });
   });
 });
