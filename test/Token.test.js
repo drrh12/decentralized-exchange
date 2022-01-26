@@ -3,7 +3,7 @@ import { tokens, EVM_REVERT } from "./helpers";
 const Token = artifacts.require("./Token");
 require("chai").use(require("chai-as-promised")).should();
 
-contract("Token", ([deployer, receiver]) => {
+contract("Token", ([deployer, receiver, exchange]) => {
   const name = "FToken";
   const symbol = "FT";
   const decimals = "18";
