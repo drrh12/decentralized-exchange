@@ -17,6 +17,7 @@ contract Token {
 
     //Track balances
     mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
     //Send balances
 
     constructor() {
@@ -34,7 +35,11 @@ contract Token {
     }
 
     //Approve tokens
-    
+    function approve(address _spender, uint256 _value) public returns(bool success) {
+        allowance[msg.sender][_spender] = _value;
+    }
+
+
     //Transfer from
 }
 
