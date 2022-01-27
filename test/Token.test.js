@@ -132,7 +132,7 @@ contract("Token", ([deployer, receiver, exchange]) => {
     });
   });
 
-  describe("sending tokens", () => {
+  describe("delegated token transfers", () => {
     let amount;
     let result;
 
@@ -158,6 +158,11 @@ contract("Token", ([deployer, receiver, exchange]) => {
         balanceOf.toString().should.equal(tokens(100).toString());
       });
 
+      it("it resets the allowance", async () => {
+        const allowance = await token.allowance(deployer, exchange);
+        allowance.toString().should.equal("0");
+      });
+
       it("emits a transfer event", async () => {
         const log = result.logs[0];
         log.event.should.eq("Transfer");
@@ -169,22 +174,17 @@ contract("Token", ([deployer, receiver, exchange]) => {
     });
 
     describe("failure", async () => {
-      // it("rejects insufficient balances", async () => {
-      //   let invalidAmount;
-      //   invalidAmount = tokens(100000000); //100M - greater than the supply
-      //   await token
-      //     .transfer(receiver, invalidAmount, { from: deployer })
-      //     .should.be.rejectedWith(EVM_REVERT);
-      //   //Attempt transfer tokens, when you have none
-      //   invalidAmount = tokens(10); //recipient has no tokens
-      //   await token
-      //     .transfer(deployer, invalidAmount, { from: receiver })
-      //     .should.be.rejectedWith(EVM_REVERT);
-      // });
-      // it("rejects invalid recipients", async () => {
-      //   await token.transfer(0x0, amount, { from: deployer }).should.be
-      //     .rejected;
-      // });
+      it("rejects insufficient balances", async () => {
+        const invalidAmount = tokens(100000000); //100M - greater than the supply
+        await token
+          .transferFrom(deployer, receiver, invalidAmount, { from: exchange })
+          .should.be.rejectedWith(EVM_REVERT);
+      });
+
+      it("rejects invalid recipients ", async () => {
+        await token.transferFrom(deployer, 0x0, amount, { from: exchange })
+          .should.be.rejected;
+      });
     });
   });
 });
