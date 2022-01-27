@@ -114,6 +114,17 @@ contract("Token", ([deployer, receiver, exchange]) => {
       });
     });
 
+    it("emits an Approval event", async () => {
+      const log = result.logs[0];
+      log.event.should.eq("Approval");
+      const event = log.args;
+      event.owner.toString().should.equal(deployer, "owner is correct");
+      event.spender.should.equal(exchange, "spender is correct");
+      event.value
+        .toString()
+        .should.equal(amount.toString(), "value is correct");
+    });
+
     describe("failure", () => {});
   });
 });
