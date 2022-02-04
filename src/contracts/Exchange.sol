@@ -1,5 +1,14 @@
 pragma solidity >=0.4.22 <0.9.0;
 
+contract Exchange {
+    //vars
+    address public feeAccount; // receive exchange fees
+
+    constructor(address _feeAccount) public {
+        feeAccount = _feeAccount;
+    }
+}
+
 // Deposit and Withdraw
 
 // Manage Orders - Make or Cancel
