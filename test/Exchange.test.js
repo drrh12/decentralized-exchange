@@ -5,16 +5,22 @@ const Exchange = artifacts.require("./Exchange");
 require("chai").use(require("chai-as-promised")).should();
 
 contract("Exchange", ([deployer, feeAccount]) => {
-  let exchange = await Exchange.new();
+  let exchange;
+  const feePercent = 1;
 
   beforeEach(async () => {
-    exchange = await Exchange.new(feeAccount);
+    exchange = await Exchange.new(feeAccount, feePercent);
   });
 
   describe("deployment", (deployment) => {
     it("tracks the fee account", async () => {
       const result = await exchange.feeAccount();
       result.should.equal(feeAccount);
+    });
+
+    it("tracks the fee percent", async () => {
+      const result = await exchange.feePercent();
+      result.toString().should.equal(feePercent.toString());
     });
   });
 });
