@@ -28,15 +28,26 @@ contract("Exchange", ([deployer, feeAccount, user1]) => {
   });
 
   describe("depositing tokens", (deployment) => {
+
+    let result;
+    let amount;
+
     beforeEach(async () => {
-      await token.approve(exchange.address, tokens(10), { from:  });
+        amount = tokens(10);
+        await token.approve(exchange.address, amount), { from: user1 });
+
+        result = await exchange.depositToken(token.address, amount, {from: user1})
     });
 
     decribe("success", () => {
-      it("tracks the token deposit", async () => {});
-    });
+        it("tracks the token deposit", async () => {});
+        //Check exchange token balance
+        let balance;
+        balance = await token.balanceOf(exchange.address);
+        balance.toString().should.equal((amount).toString());
+    
+      });
+    
+      decribe("failure", () => {});
 
-    decribe("failure", () => {});
-  });
 });
-3;
