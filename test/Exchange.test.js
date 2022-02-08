@@ -11,8 +11,12 @@ contract("Exchange", ([deployer, feeAccount, user1]) => {
   const feePercent = 1;
 
   beforeEach(async () => {
+    //deploy token
     token = await Token.new();
+    //deploy exchange
     exchange = await Exchange.new(feeAccount, feePercent);
+    //transfer token to user1
+    token.transfer(user1, tokens(100), { from: deployer });
   });
 
   describe("deployment", (deployment) => {
@@ -28,26 +32,27 @@ contract("Exchange", ([deployer, feeAccount, user1]) => {
   });
 
   describe("depositing tokens", (deployment) => {
-
     let result;
     let amount;
 
     beforeEach(async () => {
-        amount = tokens(10);
-        await token.approve(exchange.address, amount), { from: user1 });
+      amount = tokens(10);
+      await token.approve(exchange.address, amount, { from: user1 });
 
-        result = await exchange.depositToken(token.address, amount, {from: user1})
+      result = await exchange.depositToken(token.address, amount, {
+        from: user1,
+      });
     });
 
-    decribe("success", () => {
-        it("tracks the token deposit", async () => {});
+    describe("success", () => {
+      it("tracks the token deposit", async () => {
         //Check exchange token balance
         let balance;
         balance = await token.balanceOf(exchange.address);
-        balance.toString().should.equal((amount).toString());
-    
+        balance.toString().should.equal(amount.toString());
       });
-    
-      decribe("failure", () => {});
+    });
 
+    describe("failure", () => {});
+  });
 });
