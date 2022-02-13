@@ -22,6 +22,9 @@ contract Exchange {
     uint256 public feePercent; // the fee percentage 
     mapping(address => mapping(address => uint256)) public tokens;
 
+    //Events
+    event Deposit(address token, address user, uint256 amount, uint256 balance);
+
     constructor(address _feeAccount, uint256 _feePercent) {
         feeAccount = _feeAccount;
         feePercent = _feePercent;
@@ -31,11 +34,6 @@ contract Exchange {
 
         require(Token(_token).transferFrom(msg.sender, address(this), _amount));
         tokens[_token][msg.sender] = tokens[_token][msg.sender].add(_amount);
-
-        // Which token?
-        // How much?
-        // Manage deposit - update balance
-        // Send token to this contract
-        // Emit event
+        emit Deposit(_token, msg.sender, _amount, tokens[_token][msg.sender]);
     }
 }
