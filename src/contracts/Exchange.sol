@@ -1,6 +1,7 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 import "./Token.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 // TO DO:
 // [X] Set the fee account
@@ -15,9 +16,11 @@ import "./Token.sol";
 // [] Charge fees
 
 contract Exchange {
+    using SafeMath for uint;
     //vars
     address public feeAccount; // receive exchange fees
-    uint256 public feePercent; // the fee percentage
+    uint256 public feePercent; // the fee percentage 
+    mapping(address => mapping(address => uint256)) public tokens;
 
     constructor(address _feeAccount, uint256 _feePercent) {
         feeAccount = _feeAccount;
@@ -25,7 +28,10 @@ contract Exchange {
     }
 
     function depositToken(address _token, uint _amount) public {
+
         require(Token(_token).transferFrom(msg.sender, address(this), _amount));
+        tokens[_token][msg.sender] = tokens[_token][msg.sender].add(_amount);
+
         // Which token?
         // How much?
         // Manage deposit - update balance
