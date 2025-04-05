@@ -87,7 +87,7 @@ class ArbitrageBot {
       logger.info("Starting arbitrage bot...");
 
       // Initialize exchanges and websockets
-      this.setupExchanges();
+      // this.setupExchanges(); // Already called in constructor, removing to avoid duplication
 
       for (const exchange of this.exchanges) {
         await exchange.init();
@@ -148,10 +148,16 @@ class ArbitrageBot {
       clearInterval(this.intervalId);
     }
 
+    // Add a counter for checks
+    this.checkCounter = 0;
+
     this.intervalId = setInterval(async () => {
       if (!this.running) return;
 
       try {
+        // Increment check counter
+        this.checkCounter++;
+
         // Check for arbitrage opportunities
         const opportunities = await this.checkArbitrageOpportunities();
 
@@ -174,6 +180,36 @@ class ArbitrageBot {
 
           // Execute arbitrage if enabled
           await this.executeArbitrage(opportunity);
+        }
+
+        // Show a summary every 10 checks even when no opportunities are found
+        if (this.checkCounter % 10 === 0) {
+          // Get price data for logging
+          const binanceBid = this.getBestPrice("BTC/USDT", "Binance", "bid");
+          const binanceAsk = this.getBestPrice("BTC/USDT", "Binance", "ask");
+          const bitfinexBid = this.getBestPrice("BTC/USDT", "Bitfinex", "bid");
+          const bitfinexAsk = this.getBestPrice("BTC/USDT", "Bitfinex", "ask");
+
+          logger.info(
+            `Status update - Checks: ${this.checkCounter}, Found opportunities: ${this.opportunities.length}`
+          );
+
+          if (binanceBid && binanceAsk && bitfinexBid && bitfinexAsk) {
+            const spread1 = this.calculateSpread(binanceBid, bitfinexAsk);
+            const spread2 = this.calculateSpread(bitfinexBid, binanceAsk);
+
+            logger.info(
+              `Current prices - Binance: ${binanceBid}/${binanceAsk}, Bitfinex: ${bitfinexBid}/${bitfinexAsk}`
+            );
+            logger.info(
+              `Current spreads - Binance→Bitfinex: ${spread1.toFixed(
+                4
+              )}%, Bitfinex→Binance: ${spread2.toFixed(4)}%`
+            );
+            logger.info(
+              `Minimum required spread: ${this.config.minSpreadPercentage}%`
+            );
+          }
         }
       } catch (error) {
         logger.error("Error in arbitrage loop:", error);
@@ -323,6 +359,7 @@ class ArbitrageBot {
   async checkArbitrageOpportunities() {
     try {
       const opportunities = [];
+      logger.debug("Checking for arbitrage opportunities...");
 
       if (this.exchanges.length < 2) {
         logger.warn(
@@ -333,6 +370,7 @@ class ArbitrageBot {
 
       // Update all orderbooks first
       for (const pair of this.config.tradingPairs) {
+        logger.debug(`Checking pair: ${pair}`);
         if (!this.orderbooks[pair]) {
           this.orderbooks[pair] = {};
         }
@@ -372,6 +410,9 @@ class ArbitrageBot {
                   ...orderbook,
                   timestamp: Date.now(),
                 };
+                logger.debug(
+                  `Got valid orderbook for ${exchange.name} ${pair}`
+                );
 
                 // Se conseguimos obter dados válidos via REST, consideramos um sucesso
                 if (this.websocketErrors[key] < 999) {
@@ -385,6 +426,10 @@ class ArbitrageBot {
                 this.websocketErrors[key] =
                   (this.websocketErrors[key] || 0) + 1;
               }
+            } else {
+              logger.debug(
+                `Using cached orderbook for ${exchange.name} ${pair} (age: ${dataAge}ms)`
+              );
             }
           } catch (error) {
             const key = `${exchange.name}-${pair}`;
@@ -413,6 +458,9 @@ class ArbitrageBot {
               !this.orderbooks[pair][exchange1] ||
               !this.orderbooks[pair][exchange2]
             ) {
+              logger.debug(
+                `Missing orderbook data for ${pair} on ${exchange1} or ${exchange2}`
+              );
               continue;
             }
 
@@ -424,15 +472,38 @@ class ArbitrageBot {
 
             // Skip if any price is null
             if (!bestBid1 || !bestAsk2 || !bestBid2 || !bestAsk1) {
+              logger.debug(
+                `Missing price data for ${pair} on ${exchange1} or ${exchange2}`
+              );
               continue;
             }
+
+            // Log prices for debugging
+            logger.debug(
+              `${exchange1} ${pair} - Bid: ${bestBid1}, Ask: ${bestAsk1}`
+            );
+            logger.debug(
+              `${exchange2} ${pair} - Bid: ${bestBid2}, Ask: ${bestAsk2}`
+            );
 
             // Calculate spreads
             const spread1 = this.calculateSpread(bestBid1, bestAsk2);
             const spread2 = this.calculateSpread(bestBid2, bestAsk1);
 
+            logger.debug(
+              `Spread ${exchange1}->${exchange2}: ${spread1.toFixed(4)}%`
+            );
+            logger.debug(
+              `Spread ${exchange2}->${exchange1}: ${spread2.toFixed(4)}%`
+            );
+
             // Exchange 1 -> Exchange 2 opportunity
             if (spread1 >= this.config.minSpreadPercentage) {
+              logger.debug(
+                `Found opportunity: ${exchange1}->${exchange2} (${spread1.toFixed(
+                  4
+                )}%)`
+              );
               opportunities.push({
                 pair,
                 buyExchange: exchange2,
@@ -445,6 +516,11 @@ class ArbitrageBot {
 
             // Exchange 2 -> Exchange 1 opportunity
             if (spread2 >= this.config.minSpreadPercentage) {
+              logger.debug(
+                `Found opportunity: ${exchange2}->${exchange1} (${spread2.toFixed(
+                  4
+                )}%)`
+              );
               opportunities.push({
                 pair,
                 buyExchange: exchange1,
@@ -458,6 +534,7 @@ class ArbitrageBot {
         }
       }
 
+      logger.debug(`Found ${opportunities.length} arbitrage opportunities`);
       return opportunities;
     } catch (error) {
       logger.error("Error checking arbitrage opportunities:", error);

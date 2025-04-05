@@ -14327,3 +14327,396 @@ Iniciando loop de arbitragem por 30 segundos...
 2025-04-06 00:06:34 [INFO]: Bitfinex websocket opened for BTC/USDT
 2025-04-06 00:06:35 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 35430
 2025-04-06 00:06:35 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 61373
+2025-04-06 00:09:15 [INFO]: Starting arbitrage bot...
+2025-04-06 00:09:15 [INFO]: Binance connector added
+2025-04-06 00:09:15 [INFO]: Bitfinex connector added
+2025-04-06 00:09:15 [INFO]: Initialized 2 exchange connectors for Binance-Bitfinex arbitrage
+2025-04-06 00:09:15 [INFO]: Starting arbitrage bot...
+2025-04-06 00:09:15 [INFO]: Binance connector initialized
+2025-04-06 00:09:15 [WARN]: Bitfinex platform status is: 1
+2025-04-06 00:09:15 [INFO]: Bitfinex connector initialized
+2025-04-06 00:09:15 [INFO]: Setting up WebSocket connections for orderbook data...
+2025-04-06 00:09:15 [INFO]: Binance WebSocket not set up for BTC/USDT (using REST API fallback)
+2025-04-06 00:09:15 [WARN]: Failed to set up WebSocket for Binance BTC/USDT, will use REST API fallback
+2025-04-06 00:09:15 [INFO]: Arbitrage bot started. Monitoring 1 trading pairs across 2 exchanges.
+2025-04-06 00:09:15 [INFO]: Paper trading mode: ON
+2025-04-06 00:09:15 [INFO]: Arbitrage loop started, checking every 3000ms
+2025-04-06 00:09:16 [INFO]: Bitfinex websocket opened for BTC/USDT
+2025-04-06 00:09:17 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 53129
+2025-04-06 00:10:50 [INFO]: Starting arbitrage bot...
+2025-04-06 00:10:51 [INFO]: Binance connector added
+2025-04-06 00:10:51 [INFO]: Bitfinex connector added
+2025-04-06 00:10:51 [INFO]: Initialized 2 exchange connectors for Binance-Bitfinex arbitrage
+2025-04-06 00:10:51 [INFO]: Starting arbitrage bot...
+2025-04-06 00:10:51 [INFO]: Binance connector initialized
+2025-04-06 00:10:51 [WARN]: Bitfinex platform status is: 1
+2025-04-06 00:10:51 [INFO]: Bitfinex connector initialized
+2025-04-06 00:10:51 [INFO]: Setting up WebSocket connections for orderbook data...
+2025-04-06 00:10:51 [INFO]: Binance WebSocket not set up for BTC/USDT (using REST API fallback)
+2025-04-06 00:10:51 [WARN]: Failed to set up WebSocket for Binance BTC/USDT, will use REST API fallback
+2025-04-06 00:10:51 [INFO]: Arbitrage bot started. Monitoring 1 trading pairs across 2 exchanges.
+2025-04-06 00:10:51 [INFO]: Paper trading mode: ON
+2025-04-06 00:10:51 [INFO]: Arbitrage loop started, checking every 3000ms
+2025-04-06 00:10:51 [INFO]: Bitfinex websocket opened for BTC/USDT
+2025-04-06 00:10:54 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 56897
+2025-04-06 00:11:00 [INFO]: Shutting down bot...
+2025-04-06 00:11:05 [INFO]: Starting arbitrage bot...
+2025-04-06 00:11:05 [INFO]: Binance connector added
+2025-04-06 00:11:05 [INFO]: Bitfinex connector added
+2025-04-06 00:11:05 [INFO]: Initialized 2 exchange connectors for Binance-Bitfinex arbitrage
+2025-04-06 00:11:05 [INFO]: Starting arbitrage bot...
+2025-04-06 00:11:05 [INFO]: Binance connector initialized
+2025-04-06 00:11:06 [WARN]: Bitfinex platform status is: 1
+2025-04-06 00:11:06 [INFO]: Bitfinex connector initialized
+2025-04-06 00:11:06 [INFO]: Setting up WebSocket connections for orderbook data...
+2025-04-06 00:11:06 [INFO]: Binance WebSocket not set up for BTC/USDT (using REST API fallback)
+2025-04-06 00:11:06 [WARN]: Failed to set up WebSocket for Binance BTC/USDT, will use REST API fallback
+2025-04-06 00:11:06 [INFO]: Arbitrage bot started. Monitoring 1 trading pairs across 2 exchanges.
+2025-04-06 00:11:06 [INFO]: Paper trading mode: ON
+2025-04-06 00:11:06 [INFO]: Arbitrage loop started, checking every 3000ms
+2025-04-06 00:11:06 [INFO]: Bitfinex websocket opened for BTC/USDT
+2025-04-06 00:11:07 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 81420
+2025-04-06 00:11:27 [INFO]: Shutting down bot...
+2025-04-06 00:11:47 [INFO]: Starting arbitrage bot...
+2025-04-06 00:11:47 [INFO]: Binance connector added
+2025-04-06 00:11:47 [INFO]: Bitfinex connector added
+2025-04-06 00:11:47 [INFO]: Initialized 2 exchange connectors for Binance-Bitfinex arbitrage
+2025-04-06 00:11:47 [INFO]: Starting arbitrage bot...
+2025-04-06 00:11:48 [INFO]: Binance connector initialized
+2025-04-06 00:11:49 [WARN]: Bitfinex platform status is: 1
+2025-04-06 00:11:49 [INFO]: Bitfinex connector initialized
+2025-04-06 00:11:49 [INFO]: Setting up WebSocket connections for orderbook data...
+2025-04-06 00:11:49 [INFO]: Binance WebSocket not set up for BTC/USDT (using REST API fallback)
+2025-04-06 00:11:49 [WARN]: Failed to set up WebSocket for Binance BTC/USDT, will use REST API fallback
+2025-04-06 00:11:49 [INFO]: Arbitrage bot started. Monitoring 1 trading pairs across 2 exchanges.
+2025-04-06 00:11:49 [INFO]: Paper trading mode: ON
+2025-04-06 00:11:49 [INFO]: Arbitrage loop started, checking every 3000ms
+2025-04-06 00:11:49 [INFO]: Bitfinex websocket opened for BTC/USDT
+2025-04-06 00:11:51 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 39455
+2025-04-06 00:11:52 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:11:55 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:11:58 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:01 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:04 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:07 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:07 [INFO]: Shutting down bot...
+2025-04-06 00:12:15 [INFO]: Starting arbitrage bot...
+2025-04-06 00:12:15 [INFO]: Binance connector added
+2025-04-06 00:12:15 [INFO]: Bitfinex connector added
+2025-04-06 00:12:15 [INFO]: Initialized 2 exchange connectors for Binance-Bitfinex arbitrage
+2025-04-06 00:12:15 [INFO]: Starting arbitrage bot...
+2025-04-06 00:12:16 [INFO]: Binance connector initialized
+2025-04-06 00:12:16 [WARN]: Bitfinex platform status is: 1
+2025-04-06 00:12:16 [INFO]: Bitfinex connector initialized
+2025-04-06 00:12:16 [INFO]: Setting up WebSocket connections for orderbook data...
+2025-04-06 00:12:16 [INFO]: Binance WebSocket not set up for BTC/USDT (using REST API fallback)
+2025-04-06 00:12:16 [WARN]: Failed to set up WebSocket for Binance BTC/USDT, will use REST API fallback
+2025-04-06 00:12:17 [INFO]: Arbitrage bot started. Monitoring 1 trading pairs across 2 exchanges.
+2025-04-06 00:12:17 [INFO]: Paper trading mode: ON
+2025-04-06 00:12:17 [INFO]: Arbitrage loop started, checking every 3000ms
+2025-04-06 00:12:17 [INFO]: Bitfinex websocket opened for BTC/USDT
+2025-04-06 00:12:20 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 51240
+2025-04-06 00:12:20 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:23 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:26 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:29 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:32 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:35 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:38 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:41 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:44 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:47 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:50 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:12:52 [INFO]: Shutting down bot...
+2025-04-06 00:13:29 [INFO]: Starting arbitrage bot...
+2025-04-06 00:13:29 [INFO]: Binance connector added
+2025-04-06 00:13:29 [INFO]: Bitfinex connector added
+2025-04-06 00:13:29 [INFO]: Initialized 2 exchange connectors for Binance-Bitfinex arbitrage
+2025-04-06 00:13:29 [INFO]: Starting arbitrage bot...
+2025-04-06 00:13:29 [INFO]: Binance connector initialized
+2025-04-06 00:13:30 [WARN]: Bitfinex platform status is: 1
+2025-04-06 00:13:30 [INFO]: Bitfinex connector initialized
+2025-04-06 00:13:30 [INFO]: Setting up WebSocket connections for orderbook data...
+2025-04-06 00:13:30 [INFO]: Binance WebSocket not set up for BTC/USDT (using REST API fallback)
+2025-04-06 00:13:30 [WARN]: Failed to set up WebSocket for Binance BTC/USDT, will use REST API fallback
+2025-04-06 00:13:30 [INFO]: Arbitrage bot started. Monitoring 1 trading pairs across 2 exchanges.
+2025-04-06 00:13:30 [INFO]: Paper trading mode: ON
+2025-04-06 00:13:30 [INFO]: Arbitrage loop started, checking every 3000ms
+2025-04-06 00:13:31 [INFO]: Bitfinex websocket opened for BTC/USDT
+2025-04-06 00:13:32 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 52738
+2025-04-06 00:13:33 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:13:33 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:13:33 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:13:33 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:13:33 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 93ms)
+2025-04-06 00:13:33 [DEBUG]: Binance BTC/USDT - Bid: 82792, Ask: 82792.01
+2025-04-06 00:13:33 [DEBUG]: Bitfinex BTC/USDT - Bid: 82815, Ask: 82816
+2025-04-06 00:13:33 [DEBUG]: Spread Binance->Bitfinex: -0.2287%
+2025-04-06 00:13:33 [DEBUG]: Spread Bitfinex->Binance: -0.1721%
+2025-04-06 00:13:33 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:13:36 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:13:36 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:13:36 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:13:36 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:13:36 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 103ms)
+2025-04-06 00:13:36 [DEBUG]: Binance BTC/USDT - Bid: 82792, Ask: 82792.01
+2025-04-06 00:13:36 [DEBUG]: Bitfinex BTC/USDT - Bid: 82815, Ask: 82816
+2025-04-06 00:13:36 [DEBUG]: Spread Binance->Bitfinex: -0.2287%
+2025-04-06 00:13:36 [DEBUG]: Spread Bitfinex->Binance: -0.1721%
+2025-04-06 00:13:36 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:13:39 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:13:39 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:13:39 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:13:39 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:13:39 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 123ms)
+2025-04-06 00:13:39 [DEBUG]: Binance BTC/USDT - Bid: 82792, Ask: 82792.01
+2025-04-06 00:13:39 [DEBUG]: Bitfinex BTC/USDT - Bid: 82815, Ask: 82816
+2025-04-06 00:13:39 [DEBUG]: Spread Binance->Bitfinex: -0.2287%
+2025-04-06 00:13:39 [DEBUG]: Spread Bitfinex->Binance: -0.1721%
+2025-04-06 00:13:39 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:13:42 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:13:42 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:13:42 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:13:42 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:13:42 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 77ms)
+2025-04-06 00:13:42 [DEBUG]: Binance BTC/USDT - Bid: 82781.19, Ask: 82781.2
+2025-04-06 00:13:42 [DEBUG]: Bitfinex BTC/USDT - Bid: 82807, Ask: 82808
+2025-04-06 00:13:42 [DEBUG]: Spread Binance->Bitfinex: -0.2321%
+2025-04-06 00:13:42 [DEBUG]: Spread Bitfinex->Binance: -0.1687%
+2025-04-06 00:13:42 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:13:43 [INFO]: Shutting down bot...
+2025-04-06 00:14:09 [INFO]: Starting arbitrage bot...
+2025-04-06 00:14:09 [INFO]: Binance connector added
+2025-04-06 00:14:09 [INFO]: Bitfinex connector added
+2025-04-06 00:14:09 [INFO]: Initialized 2 exchange connectors for Binance-Bitfinex arbitrage
+2025-04-06 00:14:09 [INFO]: Starting arbitrage bot...
+2025-04-06 00:14:09 [INFO]: Binance connector initialized
+2025-04-06 00:14:09 [WARN]: Bitfinex platform status is: 1
+2025-04-06 00:14:09 [INFO]: Bitfinex connector initialized
+2025-04-06 00:14:09 [INFO]: Setting up WebSocket connections for orderbook data...
+2025-04-06 00:14:09 [INFO]: Binance WebSocket not set up for BTC/USDT (using REST API fallback)
+2025-04-06 00:14:09 [WARN]: Failed to set up WebSocket for Binance BTC/USDT, will use REST API fallback
+2025-04-06 00:14:10 [INFO]: Arbitrage bot started. Monitoring 1 trading pairs across 2 exchanges.
+2025-04-06 00:14:10 [INFO]: Paper trading mode: ON
+2025-04-06 00:14:10 [INFO]: Arbitrage loop started, checking every 3000ms
+2025-04-06 00:14:10 [INFO]: Bitfinex websocket opened for BTC/USDT
+2025-04-06 00:14:11 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 52420
+2025-04-06 00:14:13 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:13 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:13 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:13 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:13 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 131ms)
+2025-04-06 00:14:13 [DEBUG]: Binance BTC/USDT - Bid: 82751.5, Ask: 82751.51
+2025-04-06 00:14:13 [DEBUG]: Bitfinex BTC/USDT - Bid: 82769, Ask: 82770
+2025-04-06 00:14:13 [DEBUG]: Spread Binance->Bitfinex: -0.2221%
+2025-04-06 00:14:13 [DEBUG]: Spread Bitfinex->Binance: -0.1787%
+2025-04-06 00:14:13 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:16 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:16 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:16 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:16 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:16 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 150ms)
+2025-04-06 00:14:16 [DEBUG]: Binance BTC/USDT - Bid: 82738.4, Ask: 82738.41
+2025-04-06 00:14:16 [DEBUG]: Bitfinex BTC/USDT - Bid: 82769, Ask: 82770
+2025-04-06 00:14:16 [DEBUG]: Spread Binance->Bitfinex: -0.2379%
+2025-04-06 00:14:16 [DEBUG]: Spread Bitfinex->Binance: -0.1629%
+2025-04-06 00:14:16 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:19 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:19 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:19 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:19 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:19 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 10ms)
+2025-04-06 00:14:19 [DEBUG]: Binance BTC/USDT - Bid: 82729.43, Ask: 82729.44
+2025-04-06 00:14:19 [DEBUG]: Bitfinex BTC/USDT - Bid: 82769, Ask: 82770
+2025-04-06 00:14:19 [DEBUG]: Spread Binance->Bitfinex: -0.2487%
+2025-04-06 00:14:19 [DEBUG]: Spread Bitfinex->Binance: -0.1521%
+2025-04-06 00:14:19 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:22 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:22 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:22 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:22 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:22 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 187ms)
+2025-04-06 00:14:22 [DEBUG]: Binance BTC/USDT - Bid: 82729.43, Ask: 82729.44
+2025-04-06 00:14:22 [DEBUG]: Bitfinex BTC/USDT - Bid: 82769, Ask: 82770
+2025-04-06 00:14:22 [DEBUG]: Spread Binance->Bitfinex: -0.2487%
+2025-04-06 00:14:22 [DEBUG]: Spread Bitfinex->Binance: -0.1521%
+2025-04-06 00:14:22 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:25 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:25 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:25 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:25 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:25 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 368ms)
+2025-04-06 00:14:25 [DEBUG]: Binance BTC/USDT - Bid: 82729.43, Ask: 82729.44
+2025-04-06 00:14:25 [DEBUG]: Bitfinex BTC/USDT - Bid: 82769, Ask: 82770
+2025-04-06 00:14:25 [DEBUG]: Spread Binance->Bitfinex: -0.2487%
+2025-04-06 00:14:25 [DEBUG]: Spread Bitfinex->Binance: -0.1521%
+2025-04-06 00:14:25 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:28 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:28 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:28 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:28 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:28 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 12ms)
+2025-04-06 00:14:28 [DEBUG]: Binance BTC/USDT - Bid: 82728, Ask: 82728.01
+2025-04-06 00:14:28 [DEBUG]: Bitfinex BTC/USDT - Bid: 82765, Ask: 82766
+2025-04-06 00:14:28 [DEBUG]: Spread Binance->Bitfinex: -0.2456%
+2025-04-06 00:14:28 [DEBUG]: Spread Bitfinex->Binance: -0.1552%
+2025-04-06 00:14:28 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:31 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:31 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:31 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:31 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:31 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 189ms)
+2025-04-06 00:14:31 [DEBUG]: Binance BTC/USDT - Bid: 82728, Ask: 82728.01
+2025-04-06 00:14:31 [DEBUG]: Bitfinex BTC/USDT - Bid: 82765, Ask: 82766
+2025-04-06 00:14:31 [DEBUG]: Spread Binance->Bitfinex: -0.2456%
+2025-04-06 00:14:31 [DEBUG]: Spread Bitfinex->Binance: -0.1552%
+2025-04-06 00:14:31 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:34 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:34 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:34 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:34 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:34 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 20ms)
+2025-04-06 00:14:34 [DEBUG]: Binance BTC/USDT - Bid: 82728, Ask: 82728.01
+2025-04-06 00:14:34 [DEBUG]: Bitfinex BTC/USDT - Bid: 82765, Ask: 82766
+2025-04-06 00:14:34 [DEBUG]: Spread Binance->Bitfinex: -0.2456%
+2025-04-06 00:14:34 [DEBUG]: Spread Bitfinex->Binance: -0.1552%
+2025-04-06 00:14:34 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:37 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:37 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:37 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:37 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:37 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 126ms)
+2025-04-06 00:14:37 [DEBUG]: Binance BTC/USDT - Bid: 82728, Ask: 82728.01
+2025-04-06 00:14:37 [DEBUG]: Bitfinex BTC/USDT - Bid: 82765, Ask: 82766
+2025-04-06 00:14:37 [DEBUG]: Spread Binance->Bitfinex: -0.2456%
+2025-04-06 00:14:37 [DEBUG]: Spread Bitfinex->Binance: -0.1552%
+2025-04-06 00:14:37 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:40 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:40 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:40 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:40 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:40 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 22ms)
+2025-04-06 00:14:40 [DEBUG]: Binance BTC/USDT - Bid: 82728, Ask: 82728.01
+2025-04-06 00:14:40 [DEBUG]: Bitfinex BTC/USDT - Bid: 82765, Ask: 82766
+2025-04-06 00:14:40 [DEBUG]: Spread Binance->Bitfinex: -0.2456%
+2025-04-06 00:14:40 [DEBUG]: Spread Bitfinex->Binance: -0.1552%
+2025-04-06 00:14:40 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:40 [INFO]: Status update - Checks: 10, Found opportunities: 0
+2025-04-06 00:14:40 [INFO]: Current prices - Binance: 82728/82728.01, Bitfinex: 82765/82766
+2025-04-06 00:14:40 [INFO]: Current spreads - Binance→Bitfinex: -0.2456%, Bitfinex→Binance: -0.1552%
+2025-04-06 00:14:40 [INFO]: Minimum required spread: 0.8%
+2025-04-06 00:14:43 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:43 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:43 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:43 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:43 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 20ms)
+2025-04-06 00:14:43 [DEBUG]: Binance BTC/USDT - Bid: 82728, Ask: 82728.01
+2025-04-06 00:14:43 [DEBUG]: Bitfinex BTC/USDT - Bid: 82765, Ask: 82766
+2025-04-06 00:14:43 [DEBUG]: Spread Binance->Bitfinex: -0.2456%
+2025-04-06 00:14:43 [DEBUG]: Spread Bitfinex->Binance: -0.1552%
+2025-04-06 00:14:43 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:46 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:46 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:46 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:46 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:46 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 123ms)
+2025-04-06 00:14:46 [DEBUG]: Binance BTC/USDT - Bid: 82728, Ask: 82728.01
+2025-04-06 00:14:46 [DEBUG]: Bitfinex BTC/USDT - Bid: 82765, Ask: 82766
+2025-04-06 00:14:46 [DEBUG]: Spread Binance->Bitfinex: -0.2456%
+2025-04-06 00:14:46 [DEBUG]: Spread Bitfinex->Binance: -0.1552%
+2025-04-06 00:14:46 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:49 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:49 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:49 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:49 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:49 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 195ms)
+2025-04-06 00:14:49 [DEBUG]: Binance BTC/USDT - Bid: 82728, Ask: 82728.01
+2025-04-06 00:14:49 [DEBUG]: Bitfinex BTC/USDT - Bid: 82765, Ask: 82766
+2025-04-06 00:14:49 [DEBUG]: Spread Binance->Bitfinex: -0.2456%
+2025-04-06 00:14:49 [DEBUG]: Spread Bitfinex->Binance: -0.1552%
+2025-04-06 00:14:49 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:52 [DEBUG]: Checking for arbitrage opportunities...
+2025-04-06 00:14:52 [DEBUG]: Checking pair: BTC/USDT
+2025-04-06 00:14:52 [DEBUG]: Using REST API fallback for Binance BTC/USDT (WebSocket errors: 999)
+2025-04-06 00:14:52 [DEBUG]: Got valid orderbook for Binance BTC/USDT
+2025-04-06 00:14:52 [DEBUG]: Using cached orderbook for Bitfinex BTC/USDT (age: 164ms)
+2025-04-06 00:14:52 [DEBUG]: Binance BTC/USDT - Bid: 82724.49, Ask: 82724.5
+2025-04-06 00:14:52 [DEBUG]: Bitfinex BTC/USDT - Bid: 82765, Ask: 82766
+2025-04-06 00:14:52 [DEBUG]: Spread Binance->Bitfinex: -0.2499%
+2025-04-06 00:14:52 [DEBUG]: Spread Bitfinex->Binance: -0.1509%
+2025-04-06 00:14:52 [DEBUG]: Found 0 arbitrage opportunities
+2025-04-06 00:14:54 [INFO]: Shutting down bot...
+2025-04-06 00:15:13 [INFO]: Starting arbitrage bot...
+2025-04-06 00:15:13 [INFO]: Binance connector added
+2025-04-06 00:15:13 [INFO]: Bitfinex connector added
+2025-04-06 00:15:13 [INFO]: Initialized 2 exchange connectors for Binance-Bitfinex arbitrage
+2025-04-06 00:15:13 [INFO]: Starting arbitrage bot...
+2025-04-06 00:15:13 [INFO]: Binance connector initialized
+2025-04-06 00:15:13 [WARN]: Bitfinex platform status is: 1
+2025-04-06 00:15:13 [INFO]: Bitfinex connector initialized
+2025-04-06 00:15:13 [INFO]: Setting up WebSocket connections for orderbook data...
+2025-04-06 00:15:13 [INFO]: Binance WebSocket not set up for BTC/USDT (using REST API fallback)
+2025-04-06 00:15:13 [WARN]: Failed to set up WebSocket for Binance BTC/USDT, will use REST API fallback
+2025-04-06 00:15:14 [INFO]: Arbitrage bot started. Monitoring 1 trading pairs across 2 exchanges.
+2025-04-06 00:15:14 [INFO]: Paper trading mode: ON
+2025-04-06 00:15:14 [INFO]: Arbitrage loop started, checking every 3000ms
+2025-04-06 00:15:14 [INFO]: Bitfinex websocket opened for BTC/USDT
+2025-04-06 00:15:17 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 77653
+2025-04-06 00:15:17 [INFO]: Bitfinex ticker data for BTC/USDT: BID=82765, ASK=82766
+2025-04-06 00:15:30 [INFO]: Shutting down bot...
+2025-04-06 00:15:34 [INFO]: Starting arbitrage bot...
+2025-04-06 00:15:34 [INFO]: Binance connector added
+2025-04-06 00:15:34 [INFO]: Bitfinex connector added
+2025-04-06 00:15:34 [INFO]: Initialized 2 exchange connectors for Binance-Bitfinex arbitrage
+2025-04-06 00:15:34 [INFO]: Starting arbitrage bot...
+2025-04-06 00:15:34 [INFO]: Binance connector initialized
+2025-04-06 00:15:35 [WARN]: Bitfinex platform status is: 1
+2025-04-06 00:15:35 [INFO]: Bitfinex connector initialized
+2025-04-06 00:15:35 [INFO]: Setting up WebSocket connections for orderbook data...
+2025-04-06 00:15:35 [INFO]: Binance WebSocket not set up for BTC/USDT (using REST API fallback)
+2025-04-06 00:15:35 [WARN]: Failed to set up WebSocket for Binance BTC/USDT, will use REST API fallback
+2025-04-06 00:15:35 [INFO]: Arbitrage bot started. Monitoring 1 trading pairs across 2 exchanges.
+2025-04-06 00:15:35 [INFO]: Paper trading mode: ON
+2025-04-06 00:15:35 [INFO]: Arbitrage loop started, checking every 3000ms
+2025-04-06 00:15:35 [INFO]: Bitfinex websocket opened for BTC/USDT
+2025-04-06 00:15:38 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 46906
+2025-04-06 00:16:05 [INFO]: Status update - Checks: 10, Found opportunities: 0
+2025-04-06 00:16:05 [INFO]: Current prices - Binance: 82737.21/82737.22, Bitfinex: 82761/82762
+2025-04-06 00:16:05 [INFO]: Current spreads - Binance→Bitfinex: -0.2297%, Bitfinex→Binance: -0.1711%
+2025-04-06 00:16:05 [INFO]: Minimum required spread: 0.8%
+2025-04-06 00:16:35 [INFO]: Status update - Checks: 20, Found opportunities: 0
+2025-04-06 00:16:35 [INFO]: Current prices - Binance: 82752.2/82752.21, Bitfinex: 82761/82762
+2025-04-06 00:16:35 [INFO]: Current spreads - Binance→Bitfinex: -0.2116%, Bitfinex→Binance: -0.1892%
+2025-04-06 00:16:35 [INFO]: Minimum required spread: 0.8%
+2025-04-06 00:17:05 [INFO]: Status update - Checks: 30, Found opportunities: 0
+2025-04-06 00:17:05 [INFO]: Current prices - Binance: 82735.01/82735.02, Bitfinex: 82761/82762
+2025-04-06 00:17:05 [INFO]: Current spreads - Binance→Bitfinex: -0.2323%, Bitfinex→Binance: -0.1685%
+2025-04-06 00:17:05 [INFO]: Minimum required spread: 0.8%
+2025-04-06 00:17:30 [INFO]: Starting arbitrage bot...
+2025-04-06 00:17:30 [INFO]: Binance connector added
+2025-04-06 00:17:30 [INFO]: Bitfinex connector added
+2025-04-06 00:17:30 [INFO]: Initialized 2 exchange connectors for Binance-Bitfinex arbitrage
+2025-04-06 00:17:30 [INFO]: Starting arbitrage bot...
+2025-04-06 00:17:30 [INFO]: Binance connector initialized
+2025-04-06 00:17:30 [WARN]: Bitfinex platform status is: 1
+2025-04-06 00:17:30 [INFO]: Bitfinex connector initialized
+2025-04-06 00:17:30 [INFO]: Setting up WebSocket connections for orderbook data...
+2025-04-06 00:17:30 [INFO]: Binance WebSocket not set up for BTC/USDT (using REST API fallback)
+2025-04-06 00:17:30 [WARN]: Failed to set up WebSocket for Binance BTC/USDT, will use REST API fallback
+2025-04-06 00:17:30 [INFO]: Arbitrage bot started. Monitoring 1 trading pairs across 2 exchanges.
+2025-04-06 00:17:30 [INFO]: Paper trading mode: ON
+2025-04-06 00:17:30 [INFO]: Arbitrage loop started, checking every 3000ms
+2025-04-06 00:17:31 [INFO]: Bitfinex websocket opened for BTC/USDT
+2025-04-06 00:17:33 [INFO]: Subscribed to Bitfinex orderbook for BTC/USDT, channel ID: 47969
+2025-04-06 00:18:00 [INFO]: Status update - Checks: 10, Found opportunities: 0
+2025-04-06 00:18:00 [INFO]: Current prices - Binance: 82759.53/82759.54, Bitfinex: 82784/82785
+2025-04-06 00:18:00 [INFO]: Current spreads - Binance→Bitfinex: -0.2305%, Bitfinex→Binance: -0.1703%
+2025-04-06 00:18:00 [INFO]: Minimum required spread: 0.8%
+2025-04-06 00:18:30 [INFO]: Status update - Checks: 20, Found opportunities: 0
+2025-04-06 00:18:30 [INFO]: Current prices - Binance: 82766.51/82766.52, Bitfinex: 82780/82781
+2025-04-06 00:18:30 [INFO]: Current spreads - Binance→Bitfinex: -0.2173%, Bitfinex→Binance: -0.1835%
+2025-04-06 00:18:30 [INFO]: Minimum required spread: 0.8%
+2025-04-06 00:19:00 [INFO]: Status update - Checks: 30, Found opportunities: 0
+2025-04-06 00:19:00 [INFO]: Current prices - Binance: 82748.89/82748.9, Bitfinex: 82776/82779
+2025-04-06 00:19:00 [INFO]: Current spreads - Binance→Bitfinex: -0.2361%, Bitfinex→Binance: -0.1671%
+2025-04-06 00:19:00 [INFO]: Minimum required spread: 0.8%
