@@ -2,6 +2,7 @@ const { RESTv2, WSv2, Order } = require("bitfinex-api-node");
 const logger = require("../utils/logger");
 const { formatPair } = require("../utils/pairFormatter");
 const WebSocket = require("ws");
+const axios = require("axios");
 
 class BitfinexConnector {
   constructor(apiKey, apiSecret) {
@@ -41,9 +42,35 @@ class BitfinexConnector {
    */
   formatSymbol(pair) {
     try {
-      // Bitfinex requires a special format: tBTCUSD, tETHUSD, etc.
-      const formattedPair = formatPair(pair, "bitfinex");
-      return `t${formattedPair}`;
+      // Extrair a base e a moeda de cotação
+      const [baseCurrency, quoteCurrency] = pair.split("/");
+
+      if (!baseCurrency || !quoteCurrency) {
+        logger.error(`Invalid pair format: ${pair}`);
+        return null;
+      }
+
+      // Mapeamento específico para pares comuns
+      const knownPairs = {
+        "BTC/USDT": "tBTCUSD",
+        "ETH/USDT": "tETHUSD",
+        "SOL/USDT": "tSOLUSD",
+        "MATIC/USDT": "tMATICUSD", // Nota: Este pode não ser suportado pela Bitfinex
+      };
+
+      // Verificar se é um par conhecido e retornar o formato específico
+      if (knownPairs[pair]) {
+        return knownPairs[pair];
+      }
+
+      // Para outros pares, formatar seguindo o padrão
+      // Bitfinex geralmente usa 'usd' em vez de 'usdt'
+      const base = baseCurrency.toUpperCase();
+      const quote =
+        quoteCurrency === "USDT" ? "USD" : quoteCurrency.toUpperCase();
+
+      // Adicionar o prefixo 't' (requerido para a API da Bitfinex)
+      return `t${base}${quote}`;
     } catch (error) {
       logger.error(`Error formatting symbol for Bitfinex: ${pair}`, error);
       return null;
@@ -89,32 +116,85 @@ class BitfinexConnector {
   async getOrderBook(pair, limit = 5) {
     try {
       const symbol = this.formatSymbol(pair);
-      const orderbook = await this.rest.orderBook(symbol, { limit: limit });
 
-      // Bitfinex returns two arrays, bids and asks
-      const bids = orderbook
-        .filter((entry) => entry.amount > 0)
-        .slice(0, limit);
-      const asks = orderbook
-        .filter((entry) => entry.amount < 0)
-        .map((entry) => ({ ...entry, amount: Math.abs(entry.amount) }))
-        .slice(0, limit);
+      // Ignorar pares não suportados na Bitfinex
+      if (pair === "MATIC/USDT") {
+        logger.warn(`Bitfinex não suporta o par ${pair}`);
+        return {
+          exchange: this.name,
+          pair,
+          bids: [],
+          asks: [],
+        };
+      }
 
+      // Usar axios para acessar diretamente a API pública
+      // Esta abordagem funcionou nos testes
+      const url = `https://api-pub.bitfinex.com/v2/ticker/${symbol}`;
+
+      try {
+        const response = await axios.get(url);
+
+        if (
+          !response.data ||
+          !Array.isArray(response.data) ||
+          response.data.length < 10
+        ) {
+          logger.warn(
+            `Empty or invalid ticker data from Bitfinex for ${pair} (${symbol})`
+          );
+          return {
+            exchange: this.name,
+            pair,
+            bids: [],
+            asks: [],
+          };
+        }
+
+        // Bitfinex ticker retorna um array com várias informações:
+        // [
+        //  0: BID,            1: BID_SIZE,
+        //  2: ASK,            3: ASK_SIZE,
+        //  4: DAILY_CHANGE,   5: DAILY_CHANGE_RELATIVE,
+        //  6: LAST_PRICE,     7: VOLUME,
+        //  8: HIGH,           9: LOW
+        // ]
+        const bestBid = parseFloat(response.data[0]);
+        const bestBidSize = parseFloat(response.data[1]);
+        const bestAsk = parseFloat(response.data[2]);
+        const bestAskSize = parseFloat(response.data[3]);
+
+        logger.info(
+          `Bitfinex ticker data for ${pair}: BID=${bestBid}, ASK=${bestAsk}`
+        );
+
+        // Criar um orderbook simplificado com o melhor bid e ask
+        return {
+          exchange: this.name,
+          pair,
+          bids: [{ price: bestBid, quantity: bestBidSize }],
+          asks: [{ price: bestAsk, quantity: bestAskSize }],
+        };
+      } catch (axiosError) {
+        // Capturar especificamente erros do axios
+        logger.warn(
+          `API call failed for Bitfinex ${pair} (${symbol}): ${axiosError.message}`
+        );
+        return {
+          exchange: this.name,
+          pair,
+          bids: [],
+          asks: [],
+        };
+      }
+    } catch (error) {
+      logger.error(`Error getting Bitfinex orderbook for ${pair}:`, error);
       return {
         exchange: this.name,
         pair,
-        bids: bids.map((bid) => ({
-          price: parseFloat(bid.price),
-          quantity: parseFloat(bid.amount),
-        })),
-        asks: asks.map((ask) => ({
-          price: parseFloat(ask.price),
-          quantity: parseFloat(ask.amount),
-        })),
+        bids: [],
+        asks: [],
       };
-    } catch (error) {
-      logger.error(`Error getting Bitfinex orderbook for ${pair}:`, error);
-      return null;
     }
   }
 
@@ -206,50 +286,179 @@ class BitfinexConnector {
     try {
       const symbol = this.formatSymbol(pair);
 
-      // Create websocket client
-      const ws = new WSv2({
-        apiKey: this.apiKey,
-        apiSecret: this.apiSecret,
-        manageOrderBooks: true,
+      // Using the direct WebSocket approach instead of the WSv2 class
+      // which seems to be having issues with orderbook data handling
+      const wsURL = "wss://api-pub.bitfinex.com/ws/2";
+
+      const ws = new WebSocket(wsURL);
+
+      ws.on("open", () => {
+        logger.info(`Bitfinex websocket opened for ${pair}`);
+
+        // Subscribe to orderbook
+        const msg = JSON.stringify({
+          event: "subscribe",
+          channel: "book",
+          symbol: symbol,
+          prec: "P0",
+          freq: "F0",
+          len: "25",
+        });
+
+        ws.send(msg);
       });
 
-      // Connect and subscribe to orderbook
-      await ws.open();
-      logger.info(`Bitfinex websocket opened for ${pair}`);
+      // Channel ID and orderbook data storage
+      let channelId = null;
+      const orderbookData = {
+        bids: [],
+        asks: [],
+      };
 
-      await ws.subscribeOrderBook(symbol, "P0", "25");
+      ws.on("message", (data) => {
+        try {
+          const msg = JSON.parse(data);
 
-      ws.onOrderBook({ symbol }, (orderbook) => {
-        // Get the first few entries from the orderbook
-        const bids = orderbook.bids.slice(0, 10);
-        const asks = orderbook.asks.slice(0, 10);
+          // Handle subscription confirmation
+          if (msg.event === "subscribed" && msg.channel === "book") {
+            channelId = msg.chanId;
+            logger.info(
+              `Subscribed to Bitfinex orderbook for ${pair}, channel ID: ${channelId}`
+            );
+            return;
+          }
 
-        const formattedOrderbook = {
-          exchange: this.name,
-          pair,
-          bids: bids.map((bid) => ({
-            price: parseFloat(bid[0]),
-            quantity: parseFloat(bid[2]),
-          })),
-          asks: asks.map((ask) => ({
-            price: parseFloat(ask[0]),
-            quantity: parseFloat(Math.abs(ask[2])),
-          })),
-        };
+          // Handle orderbook updates
+          if (Array.isArray(msg) && msg[0] === channelId) {
+            // Snapshot
+            if (Array.isArray(msg[1]) && Array.isArray(msg[1][0])) {
+              orderbookData.bids = [];
+              orderbookData.asks = [];
 
-        callback(formattedOrderbook);
+              msg[1].forEach((item) => {
+                const [price, count, amount] = item;
+                if (amount > 0) {
+                  // Bid
+                  orderbookData.bids.push({
+                    price: parseFloat(price),
+                    quantity: parseFloat(amount),
+                  });
+                } else if (amount < 0) {
+                  // Ask
+                  orderbookData.asks.push({
+                    price: parseFloat(price),
+                    quantity: parseFloat(Math.abs(amount)),
+                  });
+                }
+              });
+
+              // Sort bids (descending) and asks (ascending)
+              orderbookData.bids.sort((a, b) => b.price - a.price);
+              orderbookData.asks.sort((a, b) => a.price - b.price);
+
+              // Limit to top entries
+              orderbookData.bids = orderbookData.bids.slice(0, 10);
+              orderbookData.asks = orderbookData.asks.slice(0, 10);
+
+              // Send the orderbook to the callback
+              callback({
+                exchange: this.name,
+                pair,
+                bids: orderbookData.bids,
+                asks: orderbookData.asks,
+              });
+            }
+            // Update
+            else if (Array.isArray(msg[1]) && msg[1].length === 3) {
+              const [price, count, amount] = msg[1];
+
+              // Count = 0 means delete the price level
+              if (count === 0) {
+                if (amount === 1) {
+                  // Remove from bids
+                  const index = orderbookData.bids.findIndex(
+                    (bid) => bid.price === price
+                  );
+                  if (index !== -1) {
+                    orderbookData.bids.splice(index, 1);
+                  }
+                } else if (amount === -1) {
+                  // Remove from asks
+                  const index = orderbookData.asks.findIndex(
+                    (ask) => ask.price === price
+                  );
+                  if (index !== -1) {
+                    orderbookData.asks.splice(index, 1);
+                  }
+                }
+              } else {
+                if (amount > 0) {
+                  // Update or add to bids
+                  const index = orderbookData.bids.findIndex(
+                    (bid) => bid.price === price
+                  );
+                  if (index !== -1) {
+                    orderbookData.bids[index].quantity = amount;
+                  } else {
+                    orderbookData.bids.push({
+                      price: parseFloat(price),
+                      quantity: parseFloat(amount),
+                    });
+                    orderbookData.bids.sort((a, b) => b.price - a.price);
+                    orderbookData.bids = orderbookData.bids.slice(0, 10);
+                  }
+                } else if (amount < 0) {
+                  // Update or add to asks
+                  const index = orderbookData.asks.findIndex(
+                    (ask) => ask.price === price
+                  );
+                  if (index !== -1) {
+                    orderbookData.asks[index].quantity = Math.abs(amount);
+                  } else {
+                    orderbookData.asks.push({
+                      price: parseFloat(price),
+                      quantity: parseFloat(Math.abs(amount)),
+                    });
+                    orderbookData.asks.sort((a, b) => a.price - b.price);
+                    orderbookData.asks = orderbookData.asks.slice(0, 10);
+                  }
+                }
+              }
+
+              // Send the updated orderbook to the callback
+              callback({
+                exchange: this.name,
+                pair,
+                bids: orderbookData.bids,
+                asks: orderbookData.asks,
+              });
+            }
+          }
+        } catch (err) {
+          logger.error(
+            `Error parsing Bitfinex websocket message for ${pair}:`,
+            err
+          );
+        }
       });
 
-      // Handle errors
       ws.on("error", (error) => {
         logger.error(`Bitfinex websocket error for ${pair}:`, error);
       });
 
-      // Handle close
       ws.on("close", () => {
         logger.info(`Bitfinex websocket closed for ${pair}`);
         delete this.websockets[pair];
       });
+
+      // Setup ping to keep connection alive
+      const pingInterval = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ event: "ping" }));
+        } else {
+          clearInterval(pingInterval);
+        }
+      }, 30000);
 
       // Store the websocket connection
       this.websockets[pair] = ws;
@@ -268,8 +477,10 @@ class BitfinexConnector {
     try {
       for (const [pair, ws] of Object.entries(this.websockets)) {
         try {
-          await ws.close();
-          logger.info(`Closed Bitfinex websocket for ${pair}`);
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.close();
+            logger.info(`Closed Bitfinex websocket for ${pair}`);
+          }
         } catch (error) {
           logger.error(`Error closing Bitfinex websocket for ${pair}:`, error);
         }

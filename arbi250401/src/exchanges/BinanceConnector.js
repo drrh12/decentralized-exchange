@@ -4,13 +4,16 @@ const { formatPair } = require("../utils/pairFormatter");
 
 class BinanceConnector {
   constructor(apiKey, apiSecret) {
-    this.exchange = new Binance().options({
-      APIKEY: apiKey,
-      APISECRET: apiSecret,
+    this.apiKey = apiKey;
+    this.apiSecret = apiSecret;
+    this.name = "Binance";
+    this.binance = new Binance().options({
+      APIKEY: this.apiKey,
+      APISECRET: this.apiSecret,
       useServerTime: true,
       recvWindow: 60000,
     });
-    this.name = "Binance";
+    this.websockets = {};
   }
 
   /**
@@ -18,7 +21,8 @@ class BinanceConnector {
    */
   async init() {
     try {
-      await this.exchange.useServerTime();
+      // Test API connection by getting account info
+      await this.binance.useServerTime();
       logger.info("Binance connector initialized");
       return true;
     } catch (error) {
@@ -28,24 +32,41 @@ class BinanceConnector {
   }
 
   /**
+   * Format symbol for Binance
+   * @param {string} pair - Trading pair
+   * @returns {string} - Formatted symbol
+   */
+  formatSymbol(pair) {
+    try {
+      return formatPair(pair, "binance");
+    } catch (error) {
+      logger.error(`Error formatting symbol for Binance: ${pair}`, error);
+      return null;
+    }
+  }
+
+  /**
    * Get current account balances
    */
   async getBalances() {
     try {
-      const balances = await this.exchange.balance();
+      // Get account info with balances
+      const accountInfo = await this.binance.balance();
+
       // Filter out assets with zero balance
       const filteredBalances = {};
-      for (const [asset, balance] of Object.entries(balances)) {
-        if (
-          parseFloat(balance.available) > 0 ||
-          parseFloat(balance.onOrder) > 0
-        ) {
+      for (const [asset, balance] of Object.entries(accountInfo)) {
+        const available = parseFloat(balance.available);
+        const onOrder = parseFloat(balance.onOrder);
+
+        if (available > 0 || onOrder > 0) {
           filteredBalances[asset] = {
-            available: parseFloat(balance.available),
-            onOrder: parseFloat(balance.onOrder),
+            available: available,
+            onOrder: onOrder,
           };
         }
       }
+
       return filteredBalances;
     } catch (error) {
       logger.error("Error getting Binance balances:", error);
@@ -60,24 +81,61 @@ class BinanceConnector {
    */
   async getOrderBook(pair, limit = 5) {
     try {
-      const formattedPair = formatPair(pair, "binance");
-      const depth = await this.exchange.depth(formattedPair, { limit });
+      const symbol = this.formatSymbol(pair);
 
+      // Wrap the Binance API call in a Promise to handle potential callback issues
+      const orderbook = await new Promise((resolve, reject) => {
+        try {
+          this.binance.depth(symbol, (error, depth) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve(depth);
+          });
+        } catch (err) {
+          reject(err);
+        }
+      });
+
+      // Handle case where Binance returns empty or invalid data
+      if (!orderbook || !orderbook.bids || !orderbook.asks) {
+        logger.warn(`Empty or invalid orderbook data from Binance for ${pair}`);
+        return {
+          exchange: this.name,
+          pair,
+          bids: [],
+          asks: [],
+        };
+      }
+
+      // Format the orderbook data
+      const formattedOrderbook = {
+        exchange: this.name,
+        pair,
+        bids: Object.entries(orderbook.bids)
+          .slice(0, limit)
+          .map(([price, quantity]) => ({
+            price: parseFloat(price),
+            quantity: parseFloat(quantity),
+          })),
+        asks: Object.entries(orderbook.asks)
+          .slice(0, limit)
+          .map(([price, quantity]) => ({
+            price: parseFloat(price),
+            quantity: parseFloat(quantity),
+          })),
+      };
+
+      return formattedOrderbook;
+    } catch (error) {
+      logger.error(`Error getting Binance orderbook for ${pair}:`, error);
       return {
         exchange: this.name,
         pair,
-        bids: depth.bids.map((bid) => ({
-          price: parseFloat(bid[0]),
-          quantity: parseFloat(bid[1]),
-        })),
-        asks: depth.asks.map((ask) => ({
-          price: parseFloat(ask[0]),
-          quantity: parseFloat(ask[1]),
-        })),
+        bids: [],
+        asks: [],
       };
-    } catch (error) {
-      logger.error(`Error getting Binance orderbook for ${pair}:`, error);
-      return null;
     }
   }
 
@@ -87,39 +145,31 @@ class BinanceConnector {
    * @param {number} quantity - Quantity to buy
    * @param {boolean} isQuoteAsset - If true, quantity is in quote asset (USDT), else in base asset (BTC)
    */
-  async marketBuy(pair, quantity, isQuoteAsset = true) {
+  async marketBuy(pair, quantity, isQuoteAsset = false) {
     try {
-      const formattedPair = formatPair(pair, "binance");
-      let result;
+      const symbol = this.formatSymbol(pair);
 
+      let order;
       if (isQuoteAsset) {
-        // Buy using quote asset quantity (USDT amount)
-        result = await this.exchange.marketBuy(formattedPair, false, {
+        // Buy using USDT (quote asset) quantity
+        order = await this.binance.marketBuy(symbol, false, {
           quoteOrderQty: quantity,
         });
       } else {
-        // Buy using base asset quantity (BTC amount)
-        result = await this.exchange.marketBuy(formattedPair, quantity);
+        // Buy using BTC (base asset) quantity
+        order = await this.binance.marketBuy(symbol, quantity);
       }
 
       logger.info(
         `Binance market buy order executed: ${pair}, quantity: ${quantity}, result:`,
-        result
+        order
       );
+
       return {
         success: true,
-        orderId: result.orderId,
-        executedQty: parseFloat(result.executedQty),
-        price: parseFloat(
-          result.fills.reduce(
-            (avg, fill) => avg + parseFloat(fill.price) * parseFloat(fill.qty),
-            0
-          ) /
-            result.fills.reduce(
-              (total, fill) => total + parseFloat(fill.qty),
-              0
-            )
-        ),
+        orderId: order.orderId,
+        executedQty: parseFloat(order.executedQty),
+        price: parseFloat(order.fills[0].price),
       };
     } catch (error) {
       logger.error(`Error executing Binance market buy for ${pair}:`, error);
@@ -134,27 +184,21 @@ class BinanceConnector {
    */
   async marketSell(pair, quantity) {
     try {
-      const formattedPair = formatPair(pair, "binance");
-      const result = await this.exchange.marketSell(formattedPair, quantity);
+      const symbol = this.formatSymbol(pair);
+
+      // Execute market sell order
+      const order = await this.binance.marketSell(symbol, quantity);
 
       logger.info(
         `Binance market sell order executed: ${pair}, quantity: ${quantity}, result:`,
-        result
+        order
       );
+
       return {
         success: true,
-        orderId: result.orderId,
-        executedQty: parseFloat(result.executedQty),
-        price: parseFloat(
-          result.fills.reduce(
-            (avg, fill) => avg + parseFloat(fill.price) * parseFloat(fill.qty),
-            0
-          ) /
-            result.fills.reduce(
-              (total, fill) => total + parseFloat(fill.qty),
-              0
-            )
-        ),
+        orderId: order.orderId,
+        executedQty: parseFloat(order.executedQty),
+        price: parseFloat(order.fills[0].price),
       };
     } catch (error) {
       logger.error(`Error executing Binance market sell for ${pair}:`, error);
@@ -169,26 +213,51 @@ class BinanceConnector {
    */
   setupOrderBookWebSocket(pair, callback) {
     try {
-      const formattedPair = formatPair(pair, "binance").toLowerCase();
-      const endpoint = `${formattedPair}@depth10@100ms`;
+      const symbol = this.formatSymbol(pair).toLowerCase();
 
-      this.exchange.websockets.depth(formattedPair, (depth) => {
-        const orderBook = {
-          exchange: this.name,
-          pair,
-          bids: depth.bids.map((bid) => ({
-            price: parseFloat(bid[0]),
-            quantity: parseFloat(bid[1]),
-          })),
-          asks: depth.asks.map((ask) => ({
-            price: parseFloat(ask[0]),
-            quantity: parseFloat(ask[1]),
-          })),
-        };
-        callback(orderBook);
+      // Setup websocket depths with custom handler for error protection
+      const endpoint = this.binance.websockets.depth(symbol, (depth) => {
+        try {
+          if (!depth || !depth.bids || !depth.asks) {
+            logger.warn(`Invalid depth data received from Binance for ${pair}`);
+            return;
+          }
+
+          // Format the orderbook data
+          const bids = Object.entries(depth.bids)
+            .slice(0, 10)
+            .map(([price, quantity]) => ({
+              price: parseFloat(price),
+              quantity: parseFloat(quantity),
+            }));
+
+          const asks = Object.entries(depth.asks)
+            .slice(0, 10)
+            .map(([price, quantity]) => ({
+              price: parseFloat(price),
+              quantity: parseFloat(quantity),
+            }));
+
+          // Send data through callback
+          callback({
+            exchange: this.name,
+            pair,
+            bids,
+            asks,
+          });
+        } catch (error) {
+          logger.error(
+            `Error processing Binance orderbook data for ${pair}:`,
+            error
+          );
+        }
       });
 
       logger.info(`Binance websocket established for ${pair}`);
+
+      // Store the websocket endpoint
+      this.websockets[pair] = endpoint;
+
       return true;
     } catch (error) {
       logger.error(`Error setting up Binance websocket for ${pair}:`, error);
@@ -199,9 +268,11 @@ class BinanceConnector {
   /**
    * Close all websocket connections
    */
-  closeWebSockets() {
+  async closeWebSockets() {
     try {
-      this.exchange.websockets.terminate();
+      // Binance provides a global method to terminate all websockets
+      this.binance.websockets.terminate();
+      this.websockets = {};
       logger.info("Binance websockets closed");
       return true;
     } catch (error) {

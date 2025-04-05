@@ -2,39 +2,51 @@ require("dotenv").config();
 const { ArbitrageBot } = require("./src/ArbitrageBot");
 const logger = require("./src/utils/logger");
 
-// Initialize the bot with configuration from environment variables
-const bot = new ArbitrageBot({
-  minSpreadPercentage: parseFloat(process.env.MIN_SPREAD_PERCENTAGE) || 0.8,
-  orderSizeUSD: parseFloat(process.env.ORDER_SIZE_USD) || 100,
-  checkIntervalMs: parseInt(process.env.CHECK_INTERVAL_MS) || 3000,
-  paperTrading: process.env.PAPER_TRADING === "true",
-  tradingPairs: (process.env.TRADING_PAIRS || "BTC/USDT,ETH/USDT").split(","),
-});
+async function startBot() {
+  try {
+    // Parse trading pairs from environment variable
+    const tradingPairs = process.env.TRADING_PAIRS
+      ? process.env.TRADING_PAIRS.split(",").map((pair) => pair.trim())
+      : ["BTC/USDT", "ETH/USDT"];
 
-// Handle process termination
-process.on("SIGINT", async () => {
-  logger.info("Received SIGINT. Shutting down gracefully...");
-  await bot.stop();
-  process.exit(0);
-});
+    const config = {
+      minSpreadPercentage: parseFloat(process.env.MIN_SPREAD_PERCENTAGE || 0.8),
+      orderSizeUSD: parseFloat(process.env.ORDER_SIZE_USD || 100),
+      checkIntervalMs: parseInt(process.env.CHECK_INTERVAL_MS || 3000),
+      paperTrading: process.env.PAPER_TRADING === "true",
+      tradingPairs,
+    };
 
-process.on("SIGTERM", async () => {
-  logger.info("Received SIGTERM. Shutting down gracefully...");
-  await bot.stop();
-  process.exit(0);
-});
+    logger.info("Starting arbitrage bot...");
+    const bot = new ArbitrageBot(config);
 
-// Handle uncaught exceptions
-process.on("uncaughtException", (error) => {
-  logger.error("Uncaught exception:", error);
-  process.exit(1);
-});
+    // Initialize exchanges and start monitoring
+    await bot.start();
+
+    // Handle process termination
+    process.on("SIGINT", async () => {
+      logger.info("Shutting down bot...");
+      await bot.stop();
+      process.exit(0);
+    });
+
+    // Schedule regular opportunity checks
+    bot.runArbitrageLoop();
+
+    // Every 5 minutes, log a performance summary
+    setInterval(() => {
+      const stats = bot.getPerformanceStats();
+      logger.info("Performance summary:", stats);
+    }, 5 * 60 * 1000);
+
+    return bot;
+  } catch (error) {
+    logger.error("Error starting arbitrage bot:", error);
+    process.exit(1);
+  }
+}
 
 // Start the bot
-try {
-  logger.info("Starting arbitrage bot...");
-  bot.start();
-} catch (error) {
-  logger.error("Failed to start arbitrage bot:", error);
-  process.exit(1);
-}
+startBot().catch((error) => {
+  logger.error("Fatal error:", error);
+});

@@ -1,6 +1,4 @@
 const { BinanceConnector } = require("./exchanges/BinanceConnector");
-const { KuCoinConnector } = require("./exchanges/KuCoinConnector");
-const { GateIoConnector } = require("./exchanges/GateIoConnector");
 const { BitfinexConnector } = require("./exchanges/BitfinexConnector");
 const logger = require("./utils/logger");
 const Decimal = require("decimal.js");
@@ -46,29 +44,11 @@ class ArbitrageBot {
           process.env.BINANCE_API_SECRET
         );
         this.exchanges.push(binance);
-      }
-
-      // Initialize KuCoin connector if API keys are provided
-      if (
-        process.env.KUCOIN_API_KEY &&
-        process.env.KUCOIN_API_SECRET &&
-        process.env.KUCOIN_API_PASSPHRASE
-      ) {
-        const kucoin = new KuCoinConnector(
-          process.env.KUCOIN_API_KEY,
-          process.env.KUCOIN_API_SECRET,
-          process.env.KUCOIN_API_PASSPHRASE
+        logger.info("Binance connector added");
+      } else {
+        logger.warn(
+          "Binance API credentials not provided. Binance will not be used."
         );
-        this.exchanges.push(kucoin);
-      }
-
-      // Initialize GateIo connector if API keys are provided
-      if (process.env.GATEIO_API_KEY && process.env.GATEIO_API_SECRET) {
-        const gateio = new GateIoConnector(
-          process.env.GATEIO_API_KEY,
-          process.env.GATEIO_API_SECRET
-        );
-        this.exchanges.push(gateio);
       }
 
       // Initialize Bitfinex connector if API keys are provided
@@ -78,6 +58,11 @@ class ArbitrageBot {
           process.env.BITFINEX_API_SECRET
         );
         this.exchanges.push(bitfinex);
+        logger.info("Bitfinex connector added");
+      } else {
+        logger.warn(
+          "Bitfinex API credentials not provided. Bitfinex will not be used."
+        );
       }
 
       if (this.exchanges.length < 2) {
@@ -86,74 +71,61 @@ class ArbitrageBot {
         );
       }
 
-      logger.info(`Initialized ${this.exchanges.length} exchange connectors`);
+      logger.info(
+        `Initialized ${this.exchanges.length} exchange connectors for Binance-Bitfinex arbitrage`
+      );
     } catch (error) {
       logger.error("Error setting up exchanges:", error);
     }
   }
 
   /**
-   * Start the arbitrage bot
+   * Start the bot
    */
   async start() {
-    if (this.running) {
-      logger.warn("Arbitrage bot is already running");
-      return;
-    }
-
     try {
       logger.info("Starting arbitrage bot...");
-      this.running = true;
 
-      // Initialize exchange connections
+      // Initialize exchanges and websockets
+      this.setupExchanges();
+
       for (const exchange of this.exchanges) {
         await exchange.init();
       }
 
-      // Get initial balances
-      await this.updateBalances();
-
-      // Setup websockets for orderbook data
+      // Setup WebSockets for each trading pair and exchange
       this.setupWebSockets();
 
-      // Start monitoring for arbitrage opportunities
-      this.intervalId = setInterval(
-        () => this.checkArbitrageOpportunities(),
-        this.config.checkIntervalMs
-      );
+      // Update initial balances
+      await this.updateBalances();
 
+      this.running = true;
       logger.info(
         `Arbitrage bot started. Monitoring ${this.config.tradingPairs.length} trading pairs across ${this.exchanges.length} exchanges.`
       );
       logger.info(
         `Paper trading mode: ${this.config.paperTrading ? "ON" : "OFF"}`
       );
+
+      return true;
     } catch (error) {
-      this.running = false;
       logger.error("Error starting arbitrage bot:", error);
+      return false;
     }
   }
 
   /**
-   * Stop the arbitrage bot
+   * Stop the bot
    */
   async stop() {
-    if (!this.running) {
-      logger.warn("Arbitrage bot is not running");
-      return;
-    }
-
     try {
-      logger.info("Stopping arbitrage bot...");
       this.running = false;
-
-      // Stop monitoring interval
       if (this.intervalId) {
         clearInterval(this.intervalId);
         this.intervalId = null;
       }
 
-      // Close websocket connections
+      // Close all websocket connections
       for (const exchange of this.exchanges) {
         if (typeof exchange.closeWebSockets === "function") {
           await exchange.closeWebSockets();
@@ -161,9 +133,56 @@ class ArbitrageBot {
       }
 
       logger.info("Arbitrage bot stopped");
+      return true;
     } catch (error) {
       logger.error("Error stopping arbitrage bot:", error);
+      return false;
     }
+  }
+
+  /**
+   * Run the arbitrage loop to continuously check for opportunities
+   */
+  runArbitrageLoop() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+
+    this.intervalId = setInterval(async () => {
+      if (!this.running) return;
+
+      try {
+        // Check for arbitrage opportunities
+        const opportunities = await this.checkArbitrageOpportunities();
+
+        // Process any opportunities found
+        for (const opportunity of opportunities) {
+          logger.info(
+            `Arbitrage opportunity: ${opportunity.pair} - Buy on ${
+              opportunity.buyExchange
+            } at ${opportunity.buyPrice}, Sell on ${
+              opportunity.sellExchange
+            } at ${opportunity.sellPrice}, Spread: ${opportunity.spread.toFixed(
+              4
+            )}%`
+          );
+
+          this.opportunities.push({
+            ...opportunity,
+            timestamp: Date.now(),
+          });
+
+          // Execute arbitrage if enabled
+          await this.executeArbitrage(opportunity);
+        }
+      } catch (error) {
+        logger.error("Error in arbitrage loop:", error);
+      }
+    }, this.config.checkIntervalMs);
+
+    logger.info(
+      `Arbitrage loop started, checking every ${this.config.checkIntervalMs}ms`
+    );
   }
 
   /**
@@ -234,130 +253,140 @@ class ArbitrageBot {
   }
 
   /**
-   * Check for arbitrage opportunities
+   * Get best price for a given trading pair on a specific exchange
+   * @param {string} pair - Trading pair
+   * @param {string} exchangeName - Exchange name
+   * @param {string} side - 'bid' or 'ask'
+   * @returns {number} - Best price
+   */
+  getBestPrice(pair, exchangeName, side) {
+    try {
+      const orderbook = this.orderbooks[pair]?.[exchangeName];
+      if (!orderbook) {
+        logger.warn(`No orderbook data for ${pair} on ${exchangeName}`);
+        return null;
+      }
+
+      if (side === "bid") {
+        // Best bid (highest) - what we can sell for
+        return orderbook.bids?.length > 0 ? orderbook.bids[0].price : null;
+      } else if (side === "ask") {
+        // Best ask (lowest) - what we can buy for
+        return orderbook.asks?.length > 0 ? orderbook.asks[0].price : null;
+      }
+      return null;
+    } catch (error) {
+      logger.error(
+        `Error getting best price for ${pair} on ${exchangeName}:`,
+        error
+      );
+      return null;
+    }
+  }
+
+  /**
+   * Check for arbitrage opportunities across exchanges
    */
   async checkArbitrageOpportunities() {
     try {
-      // For each trading pair
+      const opportunities = [];
+
+      if (this.exchanges.length < 2) {
+        logger.warn(
+          "Need at least 2 exchanges to check for arbitrage opportunities"
+        );
+        return [];
+      }
+
+      // Update all orderbooks first
       for (const pair of this.config.tradingPairs) {
-        // Fetch latest orderbook data if not using websockets
+        if (!this.orderbooks[pair]) {
+          this.orderbooks[pair] = {};
+        }
+
         for (const exchange of this.exchanges) {
-          if (!this.orderbooks[pair] || !this.orderbooks[pair][exchange.name]) {
+          try {
             const orderbook = await exchange.getOrderBook(pair);
-            if (orderbook) {
-              this.updateOrderbook(orderbook);
+            if (orderbook && orderbook.bids && orderbook.asks) {
+              this.orderbooks[pair][exchange.name] = orderbook;
+            } else {
+              logger.warn(
+                `Could not get valid orderbook from ${exchange.name} for ${pair}`
+              );
             }
+          } catch (error) {
+            logger.error(
+              `Error getting ${exchange.name} orderbook for ${pair}:`,
+              error
+            );
           }
         }
+      }
 
-        // Skip if we don't have orderbook data for at least 2 exchanges
-        const exchangesWithData = this.orderbooks[pair]
-          ? Object.keys(this.orderbooks[pair])
-          : [];
-        if (exchangesWithData.length < 2) {
-          continue;
-        }
+      // Compare orderbooks and find opportunities
+      for (const pair of this.config.tradingPairs) {
+        // Skip if we don't have data for this pair
+        if (!this.orderbooks[pair]) continue;
 
-        // Check all exchange combinations for this pair
-        for (let i = 0; i < exchangesWithData.length; i++) {
-          for (let j = i + 1; j < exchangesWithData.length; j++) {
-            const exchange1 = exchangesWithData[i];
-            const exchange2 = exchangesWithData[j];
+        for (let i = 0; i < this.exchanges.length; i++) {
+          for (let j = i + 1; j < this.exchanges.length; j++) {
+            const exchange1 = this.exchanges[i].name;
+            const exchange2 = this.exchanges[j].name;
 
-            // Get best bid (sell) from exchange1 and best ask (buy) from exchange2
+            // Skip if we don't have data for both exchanges
+            if (
+              !this.orderbooks[pair][exchange1] ||
+              !this.orderbooks[pair][exchange2]
+            ) {
+              continue;
+            }
+
+            // Get best prices
             const bestBid1 = this.getBestPrice(pair, exchange1, "bid");
             const bestAsk2 = this.getBestPrice(pair, exchange2, "ask");
-
-            // Calculate potential arbitrage (buy on exchange2, sell on exchange1)
-            const spread1 = this.calculateSpread(bestBid1, bestAsk2);
-
-            // Get best bid (sell) from exchange2 and best ask (buy) from exchange1
             const bestBid2 = this.getBestPrice(pair, exchange2, "bid");
             const bestAsk1 = this.getBestPrice(pair, exchange1, "ask");
 
-            // Calculate potential arbitrage (buy on exchange1, sell on exchange2)
+            // Skip if any price is null
+            if (!bestBid1 || !bestAsk2 || !bestBid2 || !bestAsk1) {
+              continue;
+            }
+
+            // Calculate spreads
+            const spread1 = this.calculateSpread(bestBid1, bestAsk2);
             const spread2 = this.calculateSpread(bestBid2, bestAsk1);
 
-            // If first arbitrage opportunity exists
+            // Exchange 1 -> Exchange 2 opportunity
             if (spread1 >= this.config.minSpreadPercentage) {
-              const opportunity = {
+              opportunities.push({
                 pair,
                 buyExchange: exchange2,
                 sellExchange: exchange1,
                 buyPrice: bestAsk2,
                 sellPrice: bestBid1,
                 spread: spread1,
-                timestamp: Date.now(),
-              };
-
-              logger.info(
-                `Arbitrage opportunity: ${pair} - Buy on ${exchange2} at ${bestAsk2}, Sell on ${exchange1} at ${bestBid1}, Spread: ${spread1.toFixed(
-                  4
-                )}%`
-              );
-
-              this.opportunities.push(opportunity);
-              await this.executeArbitrage(opportunity);
+              });
             }
 
-            // If second arbitrage opportunity exists
+            // Exchange 2 -> Exchange 1 opportunity
             if (spread2 >= this.config.minSpreadPercentage) {
-              const opportunity = {
+              opportunities.push({
                 pair,
                 buyExchange: exchange1,
                 sellExchange: exchange2,
                 buyPrice: bestAsk1,
                 sellPrice: bestBid2,
                 spread: spread2,
-                timestamp: Date.now(),
-              };
-
-              logger.info(
-                `Arbitrage opportunity: ${pair} - Buy on ${exchange1} at ${bestAsk1}, Sell on ${exchange2} at ${bestBid2}, Spread: ${spread2.toFixed(
-                  4
-                )}%`
-              );
-
-              this.opportunities.push(opportunity);
-              await this.executeArbitrage(opportunity);
+              });
             }
           }
         }
       }
+
+      return opportunities;
     } catch (error) {
       logger.error("Error checking arbitrage opportunities:", error);
-    }
-  }
-
-  /**
-   * Get the best price from an exchange orderbook
-   * @param {string} pair - Trading pair
-   * @param {string} exchangeName - Exchange name
-   * @param {string} type - Price type (bid or ask)
-   */
-  getBestPrice(pair, exchangeName, type) {
-    try {
-      if (!this.orderbooks[pair] || !this.orderbooks[pair][exchangeName]) {
-        return null;
-      }
-
-      const orderbook = this.orderbooks[pair][exchangeName];
-
-      if (type === "bid") {
-        // Best bid is the highest price someone is willing to buy at
-        return orderbook.bids[0]?.price || null;
-      } else if (type === "ask") {
-        // Best ask is the lowest price someone is willing to sell at
-        return orderbook.asks[0]?.price || null;
-      }
-
-      return null;
-    } catch (error) {
-      logger.error(
-        `Error getting best ${type} price for ${pair} on ${exchangeName}:`,
-        error
-      );
-      return null;
+      return [];
     }
   }
 
@@ -572,15 +601,21 @@ class ArbitrageBot {
   /**
    * Get performance statistics
    */
-  getPerformance() {
+  getPerformanceStats() {
     return {
-      runningTime: this.running ? Date.now() - this.startTime : 0,
       totalTrades: this.performance.totalTrades,
       successfulTrades: this.performance.successfulTrades,
       failedTrades: this.performance.failedTrades,
       totalProfit: this.performance.totalProfit,
-      startBalance: this.performance.startBalance,
-      currentBalance: this.performance.currentBalance,
+      successRate:
+        this.performance.totalTrades > 0
+          ? (
+              (this.performance.successfulTrades /
+                this.performance.totalTrades) *
+              100
+            ).toFixed(2) + "%"
+          : "N/A",
+      recentOpportunities: this.opportunities.slice(-5),
     };
   }
 }

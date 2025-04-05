@@ -10,12 +10,7 @@ const mockOrderbooks = {
       asks: [{ price: 30155.8, quantity: 2.0 }],
       timestamp: Date.now(),
     },
-    KuCoin: {
-      bids: [{ price: 30120.1, quantity: 1.2 }],
-      asks: [{ price: 30185.4, quantity: 1.8 }],
-      timestamp: Date.now(),
-    },
-    GateIo: {
+    Bitfinex: {
       bids: [{ price: 30140.2, quantity: 1.0 }],
       asks: [{ price: 30165.3, quantity: 2.2 }],
       timestamp: Date.now(),
@@ -27,12 +22,7 @@ const mockOrderbooks = {
       asks: [{ price: 2052.3, quantity: 12.0 }],
       timestamp: Date.now(),
     },
-    KuCoin: {
-      bids: [{ price: 2045.75, quantity: 8.2 }],
-      asks: [{ price: 2055.4, quantity: 9.8 }],
-      timestamp: Date.now(),
-    },
-    GateIo: {
+    Bitfinex: {
       bids: [{ price: 2048.6, quantity: 11.0 }],
       asks: [{ price: 2053.8, quantity: 10.2 }],
       timestamp: Date.now(),
@@ -51,11 +41,10 @@ class TestArbitrageBot extends ArbitrageBot {
   setupExchanges() {
     this.exchanges = [
       { name: "Binance", closeWebSockets: () => {} },
-      { name: "KuCoin", closeWebSockets: () => {} },
-      { name: "GateIo", closeWebSockets: () => {} },
+      { name: "Bitfinex", closeWebSockets: () => {} },
     ];
     logger.info(
-      `Initialized ${this.exchanges.length} mock exchange connectors`
+      `Initialized ${this.exchanges.length} mock exchange connectors for Binance-Bitfinex arbitrage`
     );
   }
 
@@ -116,7 +105,7 @@ class TestArbitrageBot extends ArbitrageBot {
           asks: [{ price: 30150.0, quantity: 2.0 }],
           timestamp: Date.now(),
         },
-        KuCoin: {
+        Bitfinex: {
           bids: [{ price: 30120.0, quantity: 1.2 }],
           asks: [{ price: 30100.0, quantity: 1.8 }], // Low buy price
           timestamp: Date.now(),
@@ -134,7 +123,7 @@ class TestArbitrageBot extends ArbitrageBot {
     // Call the internal methods directly
     const pair = "BTC/USDT";
     const exchange1 = "Binance";
-    const exchange2 = "KuCoin";
+    const exchange2 = "Bitfinex";
 
     // Get best prices
     const bestBid1 = this.getBestPrice(pair, exchange1, "bid");
@@ -242,7 +231,7 @@ class TestArbitrageBot extends ArbitrageBot {
 
 // Run the tests
 async function runTests() {
-  logger.info("Starting arbitrage bot tests...");
+  logger.info("Starting Binance-Bitfinex arbitrage bot tests...");
 
   // Create test bot
   const testBot = new TestArbitrageBot({
@@ -264,7 +253,7 @@ async function runTests() {
     await testBot.testSimulatedTrading(opportunities[0]);
   }
 
-  logger.info("Arbitrage bot tests completed");
+  logger.info("Binance-Bitfinex arbitrage bot tests completed");
 }
 
 // Run tests

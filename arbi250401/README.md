@@ -1,10 +1,10 @@
-# Cryptocurrency Arbitrage Bot
+# Cryptocurrency Arbitrage Bot: Binance & Bitfinex Edition
 
-A Node.js bot that monitors cryptocurrency price differences between Binance, KuCoin, GateIo, and Bitfinex exchanges to identify and execute arbitrage opportunities.
+A Node.js bot that monitors cryptocurrency price differences between Binance and Bitfinex exchanges to identify and execute arbitrage opportunities.
 
 ## Features
 
-- Real-time monitoring of orderbook data across multiple exchanges
+- Real-time monitoring of orderbook data across Binance and Bitfinex
 - Configurable spread threshold for arbitrage detection
 - Support for multiple trading pairs
 - Paper trading mode for risk-free testing
@@ -15,13 +15,11 @@ A Node.js bot that monitors cryptocurrency price differences between Binance, Ku
 ## Supported Exchanges
 
 - Binance
-- KuCoin
-- GateIo
 - Bitfinex
 
 ## Supported Trading Pairs
 
-Any trading pair available on the supported exchanges can be monitored. The bot is pre-configured for:
+Any trading pair available on both Binance and Bitfinex can be monitored. The bot is pre-configured for:
 
 - BTC/USDT
 - ETH/USDT
@@ -34,7 +32,7 @@ Any trading pair available on the supported exchanges can be monitored. The bot 
 
 - Node.js (v14+)
 - npm or yarn
-- API keys for the exchanges you want to use
+- API keys for both Binance and Bitfinex
 
 ### Setup
 
@@ -57,24 +55,18 @@ npm install
 cp .env.example .env
 ```
 
-4. Edit the `.env` file and add your exchange API keys and preferred configuration.
+4. Edit the `.env` file and add your Binance and Bitfinex API keys and preferred configuration.
 
 ## Configuration
 
 The bot can be configured using environment variables in the `.env` file:
 
 ```
-# Exchange API Keys
+# Binance API credentials
 BINANCE_API_KEY=your_binance_api_key
 BINANCE_API_SECRET=your_binance_api_secret
 
-KUCOIN_API_KEY=your_kucoin_api_key
-KUCOIN_API_SECRET=your_kucoin_api_secret
-KUCOIN_API_PASSPHRASE=your_kucoin_api_passphrase
-
-GATEIO_API_KEY=your_gateio_api_key
-GATEIO_API_SECRET=your_gateio_api_secret
-
+# Bitfinex API credentials
 BITFINEX_API_KEY=your_bitfinex_api_key
 BITFINEX_API_SECRET=your_bitfinex_api_secret
 
@@ -110,7 +102,7 @@ npm start
 
 This will start the bot, which will:
 
-1. Connect to the configured exchanges
+1. Connect to Binance and Bitfinex
 2. Begin monitoring orderbook data
 3. Identify arbitrage opportunities
 4. Execute trades (or simulate them in paper trading mode)
@@ -131,10 +123,10 @@ This runs a test script that verifies:
 
 The bot performs the following operations:
 
-1. **Exchange Connection**: Connects to the configured exchanges using API keys.
+1. **Exchange Connection**: Connects to Binance and Bitfinex using API keys.
 2. **Data Collection**: Collects orderbook data using REST APIs and WebSockets.
 3. **Opportunity Detection**:
-   - Compares the best bid (sell) price on one exchange with the best ask (buy) price on another.
+   - Compares the best bid (sell) price on one exchange with the best ask (buy) price on the other.
    - Calculates the spread percentage, accounting for trading fees.
    - Identifies opportunities where the spread exceeds the minimum threshold.
 4. **Execution**:
