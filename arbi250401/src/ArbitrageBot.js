@@ -10,7 +10,7 @@ class ArbitrageBot {
       orderSizeUSD: 100,
       checkIntervalMs: 3000,
       paperTrading: true,
-      tradingPairs: ["BTC/USDT", "ETH/USDT"],
+      tradingPairs: ["BTC/USDT"],
       ...config,
     };
 
@@ -190,12 +190,45 @@ class ArbitrageBot {
    */
   setupWebSockets() {
     try {
+      logger.info("Setting up WebSocket connections for orderbook data...");
+      this.websocketErrors = {}; // Track WebSocket errors by exchange and pair
+
       for (const pair of this.config.tradingPairs) {
         for (const exchange of this.exchanges) {
+          // Inicializar contador de erros para este par e exchange
+          const key = `${exchange.name}-${pair}`;
+          this.websocketErrors[key] = 0;
+
           if (typeof exchange.setupOrderBookWebSocket === "function") {
-            exchange.setupOrderBookWebSocket(pair, (orderbook) => {
-              this.updateOrderbook(orderbook);
-            });
+            const result = exchange.setupOrderBookWebSocket(
+              pair,
+              (orderbook) => {
+                // Resetar contador de erros quando recebemos dados válidos
+                if (
+                  orderbook &&
+                  orderbook.bids &&
+                  orderbook.asks &&
+                  orderbook.bids.length > 0 &&
+                  orderbook.asks.length > 0
+                ) {
+                  this.websocketErrors[key] = 0;
+                }
+
+                this.updateOrderbook(orderbook);
+              }
+            );
+
+            if (!result) {
+              logger.warn(
+                `Failed to set up WebSocket for ${exchange.name} ${pair}, will use REST API fallback`
+              );
+              this.websocketErrors[key] = 999; // Force REST fallback
+            }
+          } else {
+            logger.info(
+              `Exchange ${exchange.name} does not support WebSocket connection for orderbook`
+            );
+            this.websocketErrors[key] = 999; // Force REST fallback
           }
         }
       }
@@ -306,15 +339,57 @@ class ArbitrageBot {
 
         for (const exchange of this.exchanges) {
           try {
-            const orderbook = await exchange.getOrderBook(pair);
-            if (orderbook && orderbook.bids && orderbook.asks) {
-              this.orderbooks[pair][exchange.name] = orderbook;
-            } else {
-              logger.warn(
-                `Could not get valid orderbook from ${exchange.name} for ${pair}`
+            const key = `${exchange.name}-${pair}`;
+            const lastUpdate =
+              this.orderbooks[pair]?.[exchange.name]?.timestamp || 0;
+            const currentTime = Date.now();
+            const dataAge = currentTime - lastUpdate;
+
+            // Usar REST API fallback se:
+            // 1. Os dados WebSocket estão desatualizados (mais de 5 segundos de idade)
+            // 2. Não temos dados de orderbook para este par/exchange
+            // 3. Atingimos o limite de erros para este par/exchange
+            if (
+              !this.orderbooks[pair]?.[exchange.name] ||
+              dataAge > 5000 ||
+              this.websocketErrors[key] > 5
+            ) {
+              logger.debug(
+                `Using REST API fallback for ${
+                  exchange.name
+                } ${pair} (WebSocket errors: ${this.websocketErrors[key] || 0})`
               );
+
+              const orderbook = await exchange.getOrderBook(pair);
+              if (
+                orderbook &&
+                orderbook.bids &&
+                orderbook.asks &&
+                orderbook.bids.length > 0 &&
+                orderbook.asks.length > 0
+              ) {
+                this.orderbooks[pair][exchange.name] = {
+                  ...orderbook,
+                  timestamp: Date.now(),
+                };
+
+                // Se conseguimos obter dados válidos via REST, consideramos um sucesso
+                if (this.websocketErrors[key] < 999) {
+                  this.websocketErrors[key] = 0;
+                }
+              } else {
+                logger.warn(
+                  `Could not get valid orderbook from ${exchange.name} for ${pair} via REST API`
+                );
+                // Incrementar contador de erros para este par/exchange
+                this.websocketErrors[key] =
+                  (this.websocketErrors[key] || 0) + 1;
+              }
             }
           } catch (error) {
+            const key = `${exchange.name}-${pair}`;
+            this.websocketErrors[key] = (this.websocketErrors[key] || 0) + 1;
+
             logger.error(
               `Error getting ${exchange.name} orderbook for ${pair}:`,
               error

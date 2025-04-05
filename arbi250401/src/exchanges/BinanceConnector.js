@@ -1,4 +1,5 @@
 const Binance = require("node-binance-api");
+const axios = require("axios");
 const logger = require("../utils/logger");
 const { formatPair } = require("../utils/pairFormatter");
 
@@ -14,6 +15,7 @@ class BinanceConnector {
       recvWindow: 60000,
     });
     this.websockets = {};
+    this.baseUrl = "https://api.binance.com";
   }
 
   /**
@@ -75,7 +77,7 @@ class BinanceConnector {
   }
 
   /**
-   * Get orderbook data for a trading pair
+   * Get orderbook data for a trading pair using direct API call with axios
    * @param {string} pair - Trading pair in format BTC/USDT
    * @param {number} limit - Number of orderbook entries to fetch
    */
@@ -83,24 +85,24 @@ class BinanceConnector {
     try {
       const symbol = this.formatSymbol(pair);
 
-      // Wrap the Binance API call in a Promise to handle potential callback issues
-      const orderbook = await new Promise((resolve, reject) => {
-        try {
-          this.binance.depth(symbol, (error, depth) => {
-            if (error) {
-              reject(error);
-              return;
-            }
-            resolve(depth);
-          });
-        } catch (err) {
-          reject(err);
-        }
-      });
+      // Usar diretamente a API REST pública com axios
+      const url = `${this.baseUrl}/api/v3/depth?symbol=${symbol}&limit=${limit}`;
 
-      // Handle case where Binance returns empty or invalid data
-      if (!orderbook || !orderbook.bids || !orderbook.asks) {
-        logger.warn(`Empty or invalid orderbook data from Binance for ${pair}`);
+      const response = await axios.get(url, { timeout: 10000 });
+
+      // Verificar se os dados são válidos
+      if (
+        !response.data ||
+        !response.data.bids ||
+        !response.data.asks ||
+        !Array.isArray(response.data.bids) ||
+        !Array.isArray(response.data.asks) ||
+        response.data.bids.length === 0 ||
+        response.data.asks.length === 0
+      ) {
+        logger.warn(
+          `Empty or invalid orderbook data from Binance API for ${pair}`
+        );
         return {
           exchange: this.name,
           pair,
@@ -109,27 +111,24 @@ class BinanceConnector {
         };
       }
 
-      // Format the orderbook data
-      const formattedOrderbook = {
+      // Formatar os dados do orderbook
+      return {
         exchange: this.name,
         pair,
-        bids: Object.entries(orderbook.bids)
-          .slice(0, limit)
-          .map(([price, quantity]) => ({
-            price: parseFloat(price),
-            quantity: parseFloat(quantity),
-          })),
-        asks: Object.entries(orderbook.asks)
-          .slice(0, limit)
-          .map(([price, quantity]) => ({
-            price: parseFloat(price),
-            quantity: parseFloat(quantity),
-          })),
+        bids: response.data.bids.slice(0, limit).map(([price, quantity]) => ({
+          price: parseFloat(price),
+          quantity: parseFloat(quantity),
+        })),
+        asks: response.data.asks.slice(0, limit).map(([price, quantity]) => ({
+          price: parseFloat(price),
+          quantity: parseFloat(quantity),
+        })),
       };
-
-      return formattedOrderbook;
     } catch (error) {
-      logger.error(`Error getting Binance orderbook for ${pair}:`, error);
+      logger.error(
+        `Error getting Binance orderbook for ${pair}:`,
+        error.message
+      );
       return {
         exchange: this.name,
         pair,
@@ -213,52 +212,16 @@ class BinanceConnector {
    */
   setupOrderBookWebSocket(pair, callback) {
     try {
-      const symbol = this.formatSymbol(pair).toLowerCase();
+      // Devido a problemas com a biblioteca node-binance-api,
+      // não vamos usar WebSockets neste momento.
+      // Em vez disso, retornaremos false para indicar que o WebSocket não foi configurado.
 
-      // Setup websocket depths with custom handler for error protection
-      const endpoint = this.binance.websockets.depth(symbol, (depth) => {
-        try {
-          if (!depth || !depth.bids || !depth.asks) {
-            logger.warn(`Invalid depth data received from Binance for ${pair}`);
-            return;
-          }
+      logger.info(
+        `Binance WebSocket not set up for ${pair} (using REST API fallback)`
+      );
 
-          // Format the orderbook data
-          const bids = Object.entries(depth.bids)
-            .slice(0, 10)
-            .map(([price, quantity]) => ({
-              price: parseFloat(price),
-              quantity: parseFloat(quantity),
-            }));
-
-          const asks = Object.entries(depth.asks)
-            .slice(0, 10)
-            .map(([price, quantity]) => ({
-              price: parseFloat(price),
-              quantity: parseFloat(quantity),
-            }));
-
-          // Send data through callback
-          callback({
-            exchange: this.name,
-            pair,
-            bids,
-            asks,
-          });
-        } catch (error) {
-          logger.error(
-            `Error processing Binance orderbook data for ${pair}:`,
-            error
-          );
-        }
-      });
-
-      logger.info(`Binance websocket established for ${pair}`);
-
-      // Store the websocket endpoint
-      this.websockets[pair] = endpoint;
-
-      return true;
+      // Retornar false para indicar que o WebSocket não foi configurado
+      return false;
     } catch (error) {
       logger.error(`Error setting up Binance websocket for ${pair}:`, error);
       return false;

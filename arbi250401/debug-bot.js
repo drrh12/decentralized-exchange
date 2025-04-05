@@ -1,113 +1,92 @@
 require("dotenv").config();
-const { BitfinexConnector } = require("./src/exchanges/BitfinexConnector");
+const { ArbitrageBot } = require("./src/ArbitrageBot");
 const logger = require("./src/utils/logger");
-const axios = require("axios");
 
-async function testBitfinexFormats() {
+async function testArbitrageBot() {
   try {
-    logger.info("Testando formatos diferentes para símbolos da Bitfinex...");
+    logger.info("=== TESTE DO BOT DE ARBITRAGEM BINANCE/BITFINEX ===");
 
-    const pairs = [
-      {
-        original: "BTC/USDT",
-        formats: ["tBTCUSD", "BTCUSD", "tBTCUSDT", "BTCUSDT"],
-      },
-      {
-        original: "ETH/USDT",
-        formats: ["tETHUSD", "ETHUSD", "tETHUSDT", "ETHUSDT"],
-      },
-    ];
+    // Configuração para o teste
+    const config = {
+      minSpreadPercentage: 0.5, // Usar um valor menor para detectar mais oportunidades
+      orderSizeUSD: 100,
+      checkIntervalMs: 5000,
+      paperTrading: true,
+      tradingPairs: ["BTC/USDT"], // Simplificado para usar apenas BTC/USDT
+    };
 
-    for (const pair of pairs) {
-      logger.info(`Testando formatos para ${pair.original}`);
+    // Inicializar o bot
+    const bot = new ArbitrageBot(config);
+    logger.info("Bot inicializado com configuração para BTC/USDT");
 
-      for (const format of pair.formats) {
-        try {
-          // Tentar obter dados diretamente da API pública sem precisar de API keys
-          logger.info(`Tentando formato: ${format}`);
-          const url = `https://api-pub.bitfinex.com/v2/ticker/${format}`;
-          const response = await axios.get(url);
-
-          if (response.data && Array.isArray(response.data)) {
-            logger.info(`✅ Formato ${format} funciona! Dados recebidos:`);
-
-            // Extrair dados relevantes
-            const bestBid = parseFloat(response.data[0]);
-            const bestAsk = parseFloat(response.data[2]);
-
-            logger.info(`   - Melhor bid: ${bestBid}`);
-            logger.info(`   - Melhor ask: ${bestAsk}`);
-          } else {
-            logger.error(`❌ Formato ${format} não retornou dados válidos`);
-          }
-        } catch (error) {
-          logger.error(`❌ Formato ${format} não funciona: ${error.message}`);
-        }
-
-        // Pequena pausa entre requisições
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
-    }
-
-    logger.info("Teste de formatos concluído!");
-  } catch (error) {
-    logger.error("Erro durante o teste de formatos:", error);
-  }
-}
-
-async function testBitfinexConnection() {
-  try {
-    logger.info("Testando conexão com Bitfinex...");
-
-    // Inicializar o conector
-    const bitfinex = new BitfinexConnector(
-      process.env.BITFINEX_API_KEY,
-      process.env.BITFINEX_API_SECRET
-    );
-
-    // Testar inicialização
-    const initialized = await bitfinex.init();
-    if (!initialized) {
-      logger.error("Falha na inicialização do Bitfinex");
+    // Iniciar o bot
+    const startResult = await bot.start();
+    if (!startResult) {
+      logger.error("Falha ao iniciar o bot de arbitragem");
       return;
     }
 
-    // Testar obtenção de orderbook
-    const pairs = ["BTC/USDT", "ETH/USDT", "SOL/USDT", "MATIC/USDT"];
+    logger.info("Bot iniciado com sucesso!");
 
-    for (const pair of pairs) {
-      logger.info(`Testando formatação de símbolo para ${pair}`);
-      const symbol = bitfinex.formatSymbol(pair);
-      logger.info(`Símbolo formatado: ${symbol}`);
-
-      logger.info(`Obtendo orderbook para ${pair}`);
-      const orderbook = await bitfinex.getOrderBook(pair);
-
-      if (
-        orderbook &&
-        orderbook.bids &&
-        orderbook.asks &&
-        orderbook.bids.length > 0 &&
-        orderbook.asks.length > 0
-      ) {
-        logger.info(`✅ Orderbook para ${pair} obtido com sucesso:`);
-        logger.info(`- Melhor bid: ${orderbook.bids[0]?.price || "N/A"}`);
-        logger.info(`- Melhor ask: ${orderbook.asks[0]?.price || "N/A"}`);
-      } else {
-        logger.error(`❌ Falha ao obter orderbook para ${pair}`);
-      }
-
-      // Pequena pausa entre requisições
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Verificar os exchangers configurados
+    logger.info(`Número de exchangers configurados: ${bot.exchanges.length}`);
+    for (const exchange of bot.exchanges) {
+      logger.info(`- ${exchange.name}`);
     }
 
-    logger.info("Teste concluído!");
+    // Executar verificação única de oportunidades
+    logger.info("\nVerificando oportunidades de arbitragem para BTC/USDT...");
+    const opportunities = await bot.checkArbitrageOpportunities();
+
+    if (opportunities.length > 0) {
+      logger.info(
+        `✅ Encontradas ${opportunities.length} oportunidades de arbitragem!`
+      );
+      for (const opp of opportunities) {
+        logger.info(`- Par: ${opp.pair}`);
+        logger.info(`  Comprar em: ${opp.buyExchange} a ${opp.buyPrice}`);
+        logger.info(`  Vender em: ${opp.sellExchange} a ${opp.sellPrice}`);
+        logger.info(`  Spread: ${opp.spread.toFixed(4)}%`);
+      }
+    } else {
+      logger.info(
+        "❌ Nenhuma oportunidade de arbitragem encontrada no momento."
+      );
+    }
+
+    // Iniciar loop de arbitragem por 30 segundos
+    logger.info("\nIniciando loop de arbitragem por 30 segundos...");
+    bot.runArbitrageLoop();
+
+    // Aguardar 30 segundos
+    await new Promise((resolve) => setTimeout(resolve, 30000));
+
+    // Parar o bot
+    await bot.stop();
+    logger.info("Bot parado com sucesso!");
+
+    // Exibir estatísticas
+    const stats = bot.getPerformanceStats();
+    logger.info("\n=== ESTATÍSTICAS DE DESEMPENHO ===");
+    logger.info(`Total de verificações: ${bot.opportunities.length}`);
+    logger.info(`Total de trades: ${stats.totalTrades}`);
+    logger.info(`Trades com sucesso: ${stats.successfulTrades}`);
+    logger.info(`Trades falhos: ${stats.failedTrades}`);
+    logger.info(`Lucro total: ${stats.totalProfit.toFixed(4)} USDT`);
+    logger.info(`Taxa de sucesso: ${stats.successRate}`);
+
+    logger.info("Teste completo! Bot simplificado para apenas BTC/USDT.");
   } catch (error) {
-    logger.error("Erro durante o teste:", error);
+    logger.error("Erro durante o teste do bot:", error);
   }
 }
 
-// Executar o teste do conector
-testBitfinexConnection().catch((error) => {
-  logger.error("Erro fatal:", error);
-});
+// Executar o teste
+testArbitrageBot()
+  .then(() => {
+    process.exit(0);
+  })
+  .catch((err) => {
+    logger.error("Erro fatal:", err);
+    process.exit(1);
+  });

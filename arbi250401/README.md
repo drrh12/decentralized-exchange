@@ -1,15 +1,15 @@
 # Cryptocurrency Arbitrage Bot: Binance & Bitfinex Edition
 
-A Node.js bot that monitors cryptocurrency price differences between Binance and Bitfinex exchanges to identify and execute arbitrage opportunities.
+A Node.js bot that monitors cryptocurrency price differences between Binance and Bitfinex exchanges to identify and execute arbitrage opportunities with Bitcoin (BTC/USDT).
 
 ## Features
 
 - Real-time monitoring of orderbook data across Binance and Bitfinex
 - Configurable spread threshold for arbitrage detection
-- Support for multiple trading pairs
+- Focused on BTC/USDT trading pair
 - Paper trading mode for risk-free testing
 - Detailed logging and performance tracking
-- WebSocket support for low-latency price updates
+- REST API support for reliable price updates
 - Handling for exchange-specific trading pair formats
 
 ## Supported Exchanges
@@ -17,14 +17,11 @@ A Node.js bot that monitors cryptocurrency price differences between Binance and
 - Binance
 - Bitfinex
 
-## Supported Trading Pairs
+## Supported Trading Pair
 
-Any trading pair available on both Binance and Bitfinex can be monitored. The bot is pre-configured for:
+The bot is focused specifically on BTC/USDT to ensure maximum stability and reliability:
 
 - BTC/USDT
-- ETH/USDT
-- SOL/USDT
-- MATIC/USDT
 
 ## Installation
 
@@ -76,8 +73,8 @@ ORDER_SIZE_USD=100
 CHECK_INTERVAL_MS=3000
 PAPER_TRADING=true
 
-# Trading pairs to monitor (comma-separated)
-TRADING_PAIRS=BTC/USDT,ETH/USDT,SOL/USDT,MATIC/USDT
+# Trading pair to monitor
+TRADING_PAIRS=BTC/USDT
 
 # Logging
 LOG_LEVEL=info
@@ -89,7 +86,7 @@ LOG_LEVEL=info
 - `ORDER_SIZE_USD`: Size of each order in USD
 - `CHECK_INTERVAL_MS`: How often to check for arbitrage opportunities (in milliseconds)
 - `PAPER_TRADING`: Set to true for simulation mode, false for real trading
-- `TRADING_PAIRS`: Comma-separated list of trading pairs to monitor
+- `TRADING_PAIRS`: Set to BTC/USDT for Bitcoin trading
 - `LOG_LEVEL`: Logging level (debug, info, warn, error)
 
 ## Usage
@@ -103,7 +100,7 @@ npm start
 This will start the bot, which will:
 
 1. Connect to Binance and Bitfinex
-2. Begin monitoring orderbook data
+2. Begin monitoring BTC/USDT orderbook data
 3. Identify arbitrage opportunities
 4. Execute trades (or simulate them in paper trading mode)
 
@@ -124,7 +121,7 @@ This runs a test script that verifies:
 The bot performs the following operations:
 
 1. **Exchange Connection**: Connects to Binance and Bitfinex using API keys.
-2. **Data Collection**: Collects orderbook data using REST APIs and WebSockets.
+2. **Data Collection**: Collects orderbook data for BTC/USDT using REST APIs.
 3. **Opportunity Detection**:
    - Compares the best bid (sell) price on one exchange with the best ask (buy) price on the other.
    - Calculates the spread percentage, accounting for trading fees.
@@ -143,7 +140,7 @@ The bot implements several risk management features:
 - Paper trading mode for testing without real funds
 - Detailed logging for debugging and analysis
 - Consideration of exchange fees in spread calculations
-- WebSocket usage to minimize latency
+- Simplified to focus only on BTC/USDT for maximum stability
 
 ## Disclaimer
 

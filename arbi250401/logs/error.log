@@ -3491,3 +3491,15 @@ AxiosError: Request failed with status code 500
     at async testBitfinexConnection (/Users/flavio/Desktop/code/arbi250401/debug-bot.js:84:25)
 2025-04-05 23:48:36 [ERROR]: ❌ Falha ao obter orderbook para MATIC/USDT
 2025-04-05 23:49:14 [ERROR]: ❌ Falha ao obter orderbook para MATIC/USDT
+2025-04-05 23:52:22 [ERROR]: ❌ Spread calculation incorrect: Sell=30150.5, Buy=30100.2, Expected=0.16%, Got=-0.03%
+2025-04-05 23:52:22 [ERROR]: ❌ Spread calculation incorrect: Sell=2055.4, Buy=2052.3, Expected=0.14%, Got=-0.05%
+2025-04-05 23:52:22 [ERROR]: ❌ Spread calculation incorrect: Sell=100, Buy=101, Expected=-1.01%, Got=-1.19%
+2025-04-05 23:52:22 [ERROR]: ❌ Failed to detect arbitrage opportunity 1 with spread 0.13%
+2025-04-05 23:56:52 [ERROR]: Falha ao obter orderbook para BTC/USDT
+2025-04-05 23:56:52 [ERROR]: Falha ao obter orderbook para ETH/USDT
+2025-04-05 23:56:52 [ERROR]: Falha ao obter orderbook para SOL/USDT
+2025-04-05 23:57:21 [ERROR]: ❌ Falha ao obter orderbook para BTC/USDT: dados inválidos ou vazios
+2025-04-05 23:57:47 [ERROR]: ❌ Erro ao acessar API para MATICUSDT:
+2025-04-05 23:57:48 [ERROR]: ❌ Erro ao acessar API para tMATICUSD:
+2025-04-05 23:58:36 [ERROR]: ❌ Falha ao obter orderbook para BTC/USDT: dados inválidos ou vazios
+2025-04-05 23:59:07 [ERROR]: ❌ Erro ao testar MATIC/USDT:
