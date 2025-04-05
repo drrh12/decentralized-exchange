@@ -1,6 +1,7 @@
 const { BinanceConnector } = require("./exchanges/BinanceConnector");
 const { KuCoinConnector } = require("./exchanges/KuCoinConnector");
 const { GateIoConnector } = require("./exchanges/GateIoConnector");
+const { BitfinexConnector } = require("./exchanges/BitfinexConnector");
 const logger = require("./utils/logger");
 const Decimal = require("decimal.js");
 
@@ -68,6 +69,15 @@ class ArbitrageBot {
           process.env.GATEIO_API_SECRET
         );
         this.exchanges.push(gateio);
+      }
+
+      // Initialize Bitfinex connector if API keys are provided
+      if (process.env.BITFINEX_API_KEY && process.env.BITFINEX_API_SECRET) {
+        const bitfinex = new BitfinexConnector(
+          process.env.BITFINEX_API_KEY,
+          process.env.BITFINEX_API_SECRET
+        );
+        this.exchanges.push(bitfinex);
       }
 
       if (this.exchanges.length < 2) {

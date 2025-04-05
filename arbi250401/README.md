@@ -1,6 +1,6 @@
 # Cryptocurrency Arbitrage Bot
 
-A Node.js bot that monitors cryptocurrency price differences between Binance, KuCoin, and GateIo exchanges to identify and execute arbitrage opportunities.
+A Node.js bot that monitors cryptocurrency price differences between Binance, KuCoin, GateIo, and Bitfinex exchanges to identify and execute arbitrage opportunities.
 
 ## Features
 
@@ -17,6 +17,7 @@ A Node.js bot that monitors cryptocurrency price differences between Binance, Ku
 - Binance
 - KuCoin
 - GateIo
+- Bitfinex
 
 ## Supported Trading Pairs
 
@@ -73,6 +74,9 @@ KUCOIN_API_PASSPHRASE=your_kucoin_api_passphrase
 
 GATEIO_API_KEY=your_gateio_api_key
 GATEIO_API_SECRET=your_gateio_api_secret
+
+BITFINEX_API_KEY=your_bitfinex_api_key
+BITFINEX_API_SECRET=your_bitfinex_api_secret
 
 # Bot Configuration
 MIN_SPREAD_PERCENTAGE=0.8
